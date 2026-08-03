@@ -73,7 +73,7 @@ export default function NavItem({ item, level, isParents = false, setSelectedID 
               '&.Mui-selected': {
                 bgcolor: 'primary.lighter',
                 borderRight: '2px solid',
-                borderColor: 'primary.main',
+                borderColor: 'secondary.main',
                 color: iconSelectedColor,
                 '&:hover': { color: iconSelectedColor, bgcolor: 'primary.lighter' }
               }

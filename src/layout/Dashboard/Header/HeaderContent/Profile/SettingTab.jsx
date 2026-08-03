@@ -20,7 +20,7 @@ export default function SettingTab() {
         <ListItemIcon>
           <QuestionCircleOutlined />
         </ListItemIcon>
-        <ListItemText primary="Ayuda CONEX-CO" />
+        <ListItemText primary="Ayuda ADP" />
       </ListItemButton>
       <ListItemButton>
         <ListItemIcon>

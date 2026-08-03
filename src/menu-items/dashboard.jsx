@@ -10,12 +10,12 @@ const icons = {
 
 const dashboard = {
   id: 'group-dashboard',
-  title: 'Navigation',
+  title: 'Inicio',
   type: 'group',
   children: [
     {
       id: 'dashboard',
-      title: 'Dashboard',
+      title: 'Panel ejecutivo',
       type: 'item',
       url: '/dashboard/default',
       icon: icons.DashboardOutlined,

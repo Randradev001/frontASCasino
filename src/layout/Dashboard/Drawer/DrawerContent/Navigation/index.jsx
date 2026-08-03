@@ -6,11 +6,16 @@ import Typography from '@mui/material/Typography';
 import { useAuth } from 'contexts/AuthContext';
 import { buildAuthorizedMenu } from 'menu-items/authorizedMenu';
 import dashboard from 'menu-items/dashboard';
+import seguridad from 'menu-items/seguridad';
 import NavGroup from './NavGroup';
 
 export default function Navigation() {
-  const { menu, user } = useAuth();
-  const menuItems = useMemo(() => [dashboard, buildAuthorizedMenu(menu, user)].filter(Boolean), [menu, user]);
+  const { menu, session } = useAuth();
+  const menuItems = useMemo(
+    () =>
+      [dashboard, buildAuthorizedMenu(menu, session?.security?.canManage), session?.security?.canManage ? seguridad : null].filter(Boolean),
+    [menu, session?.security?.canManage]
+  );
 
   const navGroups = menuItems.map((item) => {
     if (item.type === 'group') return <NavGroup key={item.id} item={item} />;

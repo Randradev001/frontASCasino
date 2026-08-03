@@ -55,8 +55,10 @@ export default function Header() {
     color: 'inherit',
     elevation: 0,
     sx: {
-      borderBottom: '1px solid',
-      borderBottomColor: 'divider',
+      bgcolor: 'common.white',
+      borderBottom: '2px solid',
+      borderBottomColor: 'secondary.main',
+      boxShadow: '0 4px 14px rgba(0, 47, 89, 0.06)',
       zIndex: 1200,
       width: { xs: '100%', lg: drawerOpen ? `calc(100% - ${DRAWER_WIDTH}px)` : `calc(100% - ${MINI_DRAWER_WIDTH}px)` }
     }

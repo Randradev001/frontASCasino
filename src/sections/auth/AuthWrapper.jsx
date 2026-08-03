@@ -9,7 +9,7 @@ import AuthFooter from 'components/cards/AuthFooter';
 import Logo from 'components/logo';
 import AuthCard from './AuthCard';
 
-import heroImage from 'assets/images/auth/conex-export-hero.webp';
+import heroImage from 'assets/images/auth/agrosuper-casino-hero.webp';
 
 // ==============================|| AUTHENTICATION - WRAPPER ||============================== //
 
@@ -43,29 +43,31 @@ export default function AuthWrapper({ children }) {
 
       <Box
         component="section"
-        aria-label="Operación de packing y exportación"
+        aria-label="Operación corporativa Agrosuper"
         sx={{
           position: 'relative',
           display: { xs: 'none', md: 'block' },
           minHeight: '100dvh',
           overflow: 'hidden',
+          borderLeft: '6px solid',
+          borderColor: 'secondary.main',
           backgroundImage: `url(${heroImage})`,
           backgroundSize: 'cover',
-          backgroundPosition: 'center',
+          backgroundPosition: '58% center',
           '&::after': {
             content: '""',
             position: 'absolute',
             inset: 0,
-            background: 'linear-gradient(180deg, rgba(0, 58, 29, 0.02) 42%, rgba(0, 58, 29, 0.68) 100%)'
+            background: 'linear-gradient(180deg, rgba(0, 84, 159, 0.04) 34%, rgba(0, 47, 89, 0.86) 100%)'
           }
         }}
       >
         <Stack sx={{ position: 'absolute', zIndex: 1, left: { md: 40, lg: 56 }, right: 40, bottom: { md: 40, lg: 56 }, gap: 1 }}>
           <Typography variant="h3" sx={{ color: 'common.white', maxWidth: 560, fontWeight: 700 }}>
-            Trazabilidad desde el packing hasta el despacho
+            Gestión de pedidos para una operación conectada
           </Typography>
           <Typography variant="body1" sx={{ color: 'rgba(255, 255, 255, 0.88)' }}>
-            Operación, calidad y exportación conectadas.
+            Información confiable y una experiencia simple para los equipos Agrosuper.
           </Typography>
         </Stack>
       </Box>

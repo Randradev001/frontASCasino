@@ -1,7 +1,7 @@
 // ==============================|| PRESET THEME - DEFAULT ||============================== //
 
 export default function Default(colors) {
-  const { red, gold, cyan, green, grey } = colors;
+  const { red, gold, grey } = colors;
   const greyColors = {
     0: grey[0],
     50: grey[1],
@@ -21,37 +21,37 @@ export default function Default(colors) {
     A700: grey[14],
     A800: grey[16]
   };
-  const contrastText = '#fff';
+  const contrastText = '#FFFFFF';
 
   return {
     primary: {
-      lighter: '#e6f5ee',
-      100: '#cdebdc',
-      200: '#a7dbc1',
-      light: '#4daa7a',
-      400: '#1a9158',
-      main: '#008040',
-      dark: '#006b36',
-      700: '#005d30',
-      darker: '#004d27',
-      900: '#003a1d',
+      lighter: '#E6F1FA',
+      100: '#CCE3F3',
+      200: '#99C6E6',
+      light: '#3380B9',
+      400: '#196AAA',
+      main: '#00549F',
+      dark: '#00477F',
+      700: '#003B6F',
+      darker: '#002F59',
+      900: '#00213F',
       contrastText
     },
     secondary: {
-      lighter: greyColors[100],
-      100: greyColors[100],
-      200: greyColors[200],
-      light: greyColors[300],
-      400: greyColors[400],
-      main: greyColors[500],
-      600: greyColors[600],
-      dark: greyColors[700],
-      800: greyColors[800],
-      darker: greyColors[900],
-      A100: greyColors[0],
-      A200: greyColors.A400,
-      A300: greyColors.A700,
-      contrastText: greyColors[0]
+      lighter: '#FFF2E8',
+      100: '#FFE4D0',
+      200: '#FFC39A',
+      light: '#FF9A4F',
+      400: '#FF862C',
+      main: '#FF740C',
+      600: '#E9670B',
+      dark: '#CC5A09',
+      800: '#A84808',
+      darker: '#7F3606',
+      A100: '#FFF8F2',
+      A200: '#FFD5B5',
+      A300: '#FFA861',
+      contrastText: '#002F59'
     },
     error: {
       lighter: red[0],
@@ -70,19 +70,19 @@ export default function Default(colors) {
       contrastText: greyColors[100]
     },
     info: {
-      lighter: cyan[0],
-      light: cyan[3],
-      main: cyan[5],
-      dark: cyan[7],
-      darker: cyan[9],
+      lighter: '#E6F1FA',
+      light: '#3380B9',
+      main: '#00549F',
+      dark: '#00477F',
+      darker: '#002F59',
       contrastText
     },
     success: {
-      lighter: green[0],
-      light: green[3],
-      main: green[5],
-      dark: green[7],
-      darker: green[9],
+      lighter: '#EAF6EC',
+      light: '#66BB6A',
+      main: '#2E7D32',
+      dark: '#1B5E20',
+      darker: '#0E3B12',
       contrastText
     },
     grey: greyColors

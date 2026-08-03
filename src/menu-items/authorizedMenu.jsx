@@ -3,32 +3,25 @@ import BranchesOutlined from '@ant-design/icons/BranchesOutlined';
 import FileOutlined from '@ant-design/icons/FileOutlined';
 
 const reactRoutesByGxCall = {
-  'empresasww.aspx': '/maestros-gx/empresas',
+  'maefppersonas.aspx': '/personas',
+  'maefppersonaladm.aspx': '/personas',
+  'fichadepersona.aspx': '/personas',
+  'maessp06oppedidosplanta.aspx': '/casino/pedidos/nuevo',
+  'solicitapedidocasino.aspx': '/casino/pedidos/nuevo',
+  'solicitapedido02.aspx': '/casino/pedidos/nuevo',
+  'react.casinodashboard': '/casino/pedidos/historial',
+  'react.casinohistory': '/casino/pedidos/historial',
   'tsistemasww.aspx': '/seguridad/sistemas',
   'tmodulosww.aspx': '/seguridad/modulos',
   'tprogramww.aspx': '/seguridad/programas',
   'usuariosww.aspx': '/seguridad/usuarios',
   'urolesww.aspx': '/seguridad/roles',
-  'cco.maespeciesww.aspx': '/maestros-gx/especies',
-  'cco.macamposww.aspx': '/maestros-gx/productores',
-  'cco.matemporadasww.aspx': '/maestros-gx/temporadas',
-  'cov.covmavariedadww.aspx': '/maestros-gx/especies',
-  'cov.covenvasesww.aspx': '/maestros-gx/envases',
   wmodulos: '/seguridad/modulos',
   wprogram: '/seguridad/programas',
   wusuarios: '/seguridad/usuarios',
   wnivseg: '/seguridad/niveles',
   wasigprog: '/seguridad/asignaciones',
-  tdefemp: '/maestros-gx/empresas',
-  tsistemas: '/seguridad/sistemas',
-  wespecies: '/maestros-gx/especies',
-  wcalibres: '/maestros-gx/especies',
-  wproductores: '/maestros-gx/productores',
-  wenvcat: '/maestros-gx/envases',
-  wtempo: '/maestros-gx/temporadas',
-  wclientes: '/maestros-gx/clientes',
-  wagentes: '/maestros-gx/agentes',
-  wconsig: '/maestros-gx/consignatarios'
+  tsistemas: '/seguridad/sistemas'
 };
 
 const normalizeCall = (value) =>
@@ -44,9 +37,7 @@ export const resolveProgramRoute = (gxCall) => reactRoutesByGxCall[normalizeCall
 const deduplicatePrograms = (programs) =>
   programs.filter((program, index) => programs.findIndex((candidate) => candidate.url === program.url) === index);
 
-export const buildAuthorizedMenu = (systems = [], user = null) => {
-  const roles = Array.isArray(user?.roles) ? user.roles.map((role) => String(role).toUpperCase()) : [];
-  const canManageSecurity = roles.includes('ADMINFULL') || Number(user?.nivelSeguridad || 0) >= 900;
+export const buildAuthorizedMenu = (systems = [], canManageSecurity = false) => {
   const authorizedSystems = systems
     .map((system) => {
       const modules = (system.modulos || [])
@@ -54,35 +45,16 @@ export const buildAuthorizedMenu = (systems = [], user = null) => {
           const programs = deduplicatePrograms(
             (module.programas || [])
               .map((program) => ({ ...program, url: resolveProgramRoute(program.llamadoGX) }))
-              .filter((program) => program.url)
+              .filter((program) => program.url && (canManageSecurity || !program.url.startsWith('/seguridad/')))
               .map((program) => ({
                 id: `program-${system.sistCod}-${module.modCod}-${program.progCod}`,
-                title:
-                  {
-                    '/maestros-gx/especies': 'Especies',
-                    '/maestros-gx/envases': 'Envases',
-                    '/maestros-gx/productores': 'Productores',
-                    '/maestros-gx/clientes': 'Clientes',
-                    '/maestros-gx/agentes': 'Agentes',
-                    '/maestros-gx/consignatarios': 'Consignatarios'
-                  }[program.url] || program.nombre,
+                title: program.nombre,
                 type: 'item',
                 url: program.url,
                 target: Boolean(program.target),
                 icon: FileOutlined
               }))
           );
-          if (canManageSecurity && Number(system.sistCod) === 1 && Number(module.modCod) === 1) {
-            programs.push({
-              id: 'program-security-roles',
-              title: 'Roles y usuarios',
-              type: 'item',
-              url: '/seguridad/roles',
-              target: false,
-              icon: FileOutlined
-            });
-          }
-
           if (!programs.length) return null;
           return {
             id: `module-${system.sistCod}-${module.modCod}`,
@@ -108,7 +80,7 @@ export const buildAuthorizedMenu = (systems = [], user = null) => {
   if (!authorizedSystems.length) return null;
   return {
     id: 'authorized-systems',
-    title: 'CONEX-CO',
+    title: 'ADP - Casino',
     type: 'group',
     children: authorizedSystems
   };

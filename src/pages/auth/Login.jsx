@@ -13,12 +13,12 @@ export default function Login() {
           <Stack sx={{ gap: 1 }}>
             <Typography variant="h2" sx={{ fontSize: { xs: '1.75rem', sm: '2rem' }, fontWeight: 700 }}>
               Bienvenido a{' '}
-              <Typography component="span" variant="inherit" sx={{ whiteSpace: 'nowrap' }}>
-                CONEX-CO
+              <Typography component="span" variant="inherit" sx={{ color: 'primary.main', whiteSpace: 'nowrap' }}>
+                ADP
               </Typography>
             </Typography>
             <Typography variant="body1" color="text.secondary">
-              Ingrese sus credenciales para continuar.
+              Acceso corporativo a pedidos de Casino, Personas e información de negocio.
             </Typography>
           </Stack>
         </Grid>

@@ -1,70 +1,71 @@
+import PropTypes from 'prop-types';
+
 // material-ui
-import { useTheme } from '@mui/material/styles';
+import Box from '@mui/material/Box';
+import Stack from '@mui/material/Stack';
+import Typography from '@mui/material/Typography';
 
-// ==============================|| LOGO SVG ||============================== //
+// assets
+import agrosuperLogo from 'assets/images/brand/agrosuper-logo.png';
 
-export default function LogoMain() {
-  const theme = useTheme();
+// ==============================|| AGROSUPER + ADP LOGO ||============================== //
 
+export default function LogoMain({ reverse = false }) {
   return (
-    <svg
-      width="214"
-      height="48"
-      viewBox="0 0 214 48"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
+    <Stack
+      direction="row"
+      sx={{
+        position: 'relative',
+        width: 214,
+        height: 48,
+        px: 1.25,
+        alignItems: 'center',
+        gap: 1.25,
+        overflow: 'hidden',
+        borderRadius: reverse ? 0 : 1.5,
+        bgcolor: reverse ? 'transparent' : 'primary.main',
+        boxShadow: reverse ? 'none' : '0 8px 20px rgba(0, 84, 159, 0.15)',
+        '&::after': {
+          content: '""',
+          position: 'absolute',
+          right: 0,
+          bottom: 0,
+          left: 0,
+          height: 3,
+          bgcolor: 'secondary.main'
+        }
+      }}
       role="img"
-      aria-label="CONEX-CO, Control de exportación"
+      aria-label="Agrosuper ADP"
     >
-      <rect x="13" y="12" width="25" height="25" rx="5" fill={theme.vars.palette.grey[200]} />
-      <rect x="2" y="20" width="27" height="27" rx="6" fill={theme.vars.palette.primary.dark} />
-      <rect x="26" y="1" width="27" height="27" rx="6" fill={theme.vars.palette.primary.main} />
-      <text
-        x="15.5"
-        y="39.5"
-        fill={theme.vars.palette.common.white}
-        fontFamily="Public Sans, Arial, sans-serif"
-        fontSize="19"
-        fontWeight="800"
-        textAnchor="middle"
-        letterSpacing="0"
-      >
-        C
-      </text>
-      <text
-        x="39.5"
-        y="21"
-        fill={theme.vars.palette.common.white}
-        fontFamily="Public Sans, Arial, sans-serif"
-        fontSize="18"
-        fontWeight="800"
-        textAnchor="middle"
-        letterSpacing="0"
-      >
-        O
-      </text>
-      <text
-        x="64"
-        y="25"
-        fill={theme.vars.palette.primary.darker}
-        fontFamily="Public Sans, Arial, sans-serif"
-        fontSize="20"
-        fontWeight="800"
-        letterSpacing="0"
-      >
-        CONEX-CO
-      </text>
-      <text
-        x="64"
-        y="40"
-        fill={theme.vars.palette.text.secondary}
-        fontFamily="Public Sans, Arial, sans-serif"
-        fontSize="8.5"
-        fontWeight="600"
-        letterSpacing="0"
-      >
-        CONTROL DE EXPORTACIÓN
-      </text>
-    </svg>
+      <Box sx={{ position: 'relative', width: 104, height: 41, flexShrink: 0, overflow: 'hidden' }}>
+        <Box
+          component="img"
+          src={agrosuperLogo}
+          alt="Agrosuper"
+          sx={{ position: 'absolute', top: -17, left: 0, width: 104, height: 'auto' }}
+        />
+      </Box>
+
+      <Box sx={{ minWidth: 0, pl: 1.25, borderLeft: '1px solid rgba(255, 255, 255, 0.34)' }}>
+        <Typography sx={{ color: 'common.white', fontSize: '1.05rem', fontWeight: 800, lineHeight: 1, letterSpacing: '0.04em' }}>
+          ADP
+        </Typography>
+        <Typography
+          sx={{
+            mt: 0.45,
+            color: 'rgba(255, 255, 255, 0.78)',
+            fontSize: '0.46rem',
+            fontWeight: 700,
+            lineHeight: 1.15,
+            letterSpacing: '0.08em'
+          }}
+        >
+          GESTIÓN INTERNA
+        </Typography>
+      </Box>
+    </Stack>
   );
 }
+
+LogoMain.propTypes = { reverse: PropTypes.bool };

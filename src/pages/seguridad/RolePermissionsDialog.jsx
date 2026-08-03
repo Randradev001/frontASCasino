@@ -29,7 +29,7 @@ const moduleKey = (row) => `${row.SistCod}|${row.Modcod}`;
 const programKey = (row) => `${row.SistCod}|${row.Modcod}|${row.ProgCod}`;
 const getErrorMessage = (error, fallback) => error?.response?.data?.message || error?.message || fallback;
 
-export default function RolePermissionsDialog({ open, role, onClose, onNotify }) {
+export default function RolePermissionsDialog({ open, role, initialSystemCode, onClose, onNotify }) {
   const queryClient = useQueryClient();
   const roleCode = String(role?.ROLCod || '').trim();
   const [systemCode, setSystemCode] = useState('');
@@ -48,8 +48,11 @@ export default function RolePermissionsDialog({ open, role, onClose, onNotify })
 
   useEffect(() => {
     if (!open || !permissions) return;
-    const firstSelected = permissions.selected.programs[0];
-    const initialSystem = firstSelected?.SistCod ?? permissions.systems[0]?.SistCod;
+    const requestedSystem = permissions.systems.find((item) => String(item.SistCod) === String(initialSystemCode));
+    const firstSelected = requestedSystem
+      ? permissions.selected.programs.find((item) => String(item.SistCod) === String(requestedSystem.SistCod))
+      : permissions.selected.programs[0];
+    const initialSystem = requestedSystem?.SistCod ?? firstSelected?.SistCod ?? permissions.systems[0]?.SistCod;
     const modules = permissions.modules.filter((item) => String(item.SistCod) === String(initialSystem));
     const initialModule = firstSelected?.Modcod ?? modules[0]?.Modcod;
 
@@ -58,7 +61,7 @@ export default function RolePermissionsDialog({ open, role, onClose, onNotify })
     setSelectedPrograms(new Set(permissions.selected.programs.map(programKey)));
     setSearch('');
     setDirty(false);
-  }, [open, permissions]);
+  }, [initialSystemCode, open, permissions]);
 
   const systemModules = useMemo(
     () => (permissions?.modules || []).filter((item) => String(item.SistCod) === systemCode),
@@ -162,6 +165,10 @@ export default function RolePermissionsDialog({ open, role, onClose, onNotify })
               </Stack>
 
               {dirty && <Alert severity="info">Hay cambios sin guardar.</Alert>}
+
+              {selectedPrograms.size === 0 && !dirty && (
+                <Alert severity="info">Este rol aún no tiene programas configurados en la plantilla CONEX.</Alert>
+              )}
 
               <TextField
                 select
@@ -311,6 +318,7 @@ export default function RolePermissionsDialog({ open, role, onClose, onNotify })
 RolePermissionsDialog.propTypes = {
   open: PropTypes.bool.isRequired,
   role: PropTypes.object,
+  initialSystemCode: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   onClose: PropTypes.func.isRequired,
   onNotify: PropTypes.func
 };

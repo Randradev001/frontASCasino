@@ -1,48 +1,42 @@
+import PropTypes from 'prop-types';
+
 // material-ui
-import { useTheme } from '@mui/material/styles';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
 
-// ==============================|| LOGO ICON SVG ||============================== //
+// ==============================|| ADP LOGO ICON ||============================== //
 
-export default function LogoIcon() {
-  const theme = useTheme();
-
+export default function LogoIcon({ reverse = false }) {
   return (
-    <svg
-      width="42"
-      height="42"
-      viewBox="0 0 42 42"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
+    <Box
       role="img"
-      aria-label="CONEX-CO"
+      aria-label="ADP Agrosuper"
+      sx={{
+        position: 'relative',
+        display: 'grid',
+        width: 40,
+        height: 40,
+        placeItems: 'center',
+        overflow: 'hidden',
+        border: '1px solid',
+        borderColor: reverse ? 'rgba(255, 255, 255, 0.34)' : 'primary.dark',
+        borderRadius: 1.5,
+        bgcolor: reverse ? 'primary.dark' : 'primary.main',
+        boxShadow: '0 6px 16px rgba(0, 84, 159, 0.15)',
+        '&::after': {
+          content: '""',
+          position: 'absolute',
+          right: 0,
+          bottom: 0,
+          left: 0,
+          height: 4,
+          bgcolor: 'secondary.main'
+        }
+      }}
     >
-      <rect x="11" y="11" width="22" height="22" rx="5" fill={theme.vars.palette.grey[200]} />
-      <rect x="2" y="17" width="24" height="24" rx="6" fill={theme.vars.palette.primary.dark} />
-      <rect x="20" y="1" width="21" height="23" rx="6" fill={theme.vars.palette.primary.main} />
-      <text
-        x="14"
-        y="35"
-        fill={theme.vars.palette.common.white}
-        fontFamily="Public Sans, Arial, sans-serif"
-        fontSize="16"
-        fontWeight="800"
-        textAnchor="middle"
-        letterSpacing="0"
-      >
-        C
-      </text>
-      <text
-        x="30.5"
-        y="18"
-        fill={theme.vars.palette.common.white}
-        fontFamily="Public Sans, Arial, sans-serif"
-        fontSize="15"
-        fontWeight="800"
-        textAnchor="middle"
-        letterSpacing="0"
-      >
-        O
-      </text>
-    </svg>
+      <Typography sx={{ color: 'common.white', fontSize: '0.78rem', fontWeight: 800, letterSpacing: '0.04em' }}>ADP</Typography>
+    </Box>
   );
 }
+
+LogoIcon.propTypes = { reverse: PropTypes.bool };

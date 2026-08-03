@@ -32,34 +32,32 @@ export default defineConfig(({ mode }) => {
         // Add more aliases as needed
       }
     },
-    plugins: [react(),
-       jsconfigPaths(),
-       VitePWA({  // congigure PWA plugin
-            registerType: 'autoUpdate',
-            manifest: {
-              name: 'CONEX-CO - Control de exportación',
-              short_name: 'CONEX-CO',
-              description: 'Control de packing, procesos y exportación de fruta',
-              theme_color: '#008040',
-              background_color: '#f8faf9',
-              display: 'standalone',
-              start_url: '/free/',
-              scope: '/free/',
-              icons: [
-                {
-                  src: 'icon-192.png',
-                  sizes: '192x192',
-                  type: 'image/png'
-                },
-                {
-                  src: 'icon-512.png',
-                  sizes: '512x512',
-                  type: 'image/png'
-                }
-              ]
+    plugins: [
+      react(),
+      jsconfigPaths(),
+      VitePWA({
+        // congigure PWA plugin
+        registerType: 'autoUpdate',
+        manifest: {
+          name: 'ADP - Agrosuper',
+          short_name: 'ADP',
+          description: 'Gestión corporativa de Casino, Personas y Seguridad',
+          theme_color: '#00549F',
+          background_color: '#FFFFFF',
+          display: 'standalone',
+          start_url: '/free/',
+          scope: '/free/',
+          icons: [
+            {
+              src: 'favicon.svg',
+              sizes: 'any',
+              type: 'image/svg+xml',
+              purpose: 'any maskable'
             }
-          })
-      ],
+          ]
+        }
+      })
+    ],
     build: {
       chunkSizeWarningLimit: 1000,
       sourcemap: true,

@@ -5,25 +5,25 @@ import { presetPalettes } from '@ant-design/colors';
 import ThemeOption from './theme';
 import { extendPaletteWithChannels } from 'utils/colorUtils';
 
-const greyAscent = ['#f8faf9', '#a7b1aa', '#374151', '#1f2937'];
+const greyAscent = ['#F7FAFC', '#9CB0BF', '#365064', '#253F54'];
 
 // ==============================|| GREY COLORS BUILDER ||============================== //
 
 function buildGrey() {
   const greyPrimary = [
-    '#ffffff',
-    '#f8faf9',
-    '#f1f5f2',
-    '#e8eee9',
-    '#d8e3dc',
-    '#a7b1aa',
-    '#6b7280',
-    '#4b5563',
-    '#374151',
-    '#1f2937',
-    '#111827'
+    '#FFFFFF',
+    '#F7FAFC',
+    '#EEF4F8',
+    '#DFE8EF',
+    '#CCD9E2',
+    '#9CB0BF',
+    '#6B8191',
+    '#4D6475',
+    '#365064',
+    '#253F54',
+    '#16324A'
   ];
-  const greyConstant = ['#f8faf9', '#d8e3dc'];
+  const greyConstant = ['#F7FAFC', '#DFE8EF'];
 
   return [...greyPrimary, ...greyAscent, ...greyConstant];
 }
@@ -34,7 +34,7 @@ export function buildPalette(presetColor) {
   const lightColors = { ...presetPalettes, grey: buildGrey() };
   const lightPaletteColor = ThemeOption(lightColors, presetColor);
 
-  const commonColor = { common: { black: '#000', white: '#fff' } };
+  const commonColor = { common: { black: '#000000', white: '#FFFFFF' } };
 
   const extendedLight = extendPaletteWithChannels(lightPaletteColor);
   const extendedCommon = extendPaletteWithChannels(commonColor);
@@ -45,19 +45,19 @@ export function buildPalette(presetColor) {
       ...extendedCommon,
       ...extendedLight,
       text: {
-        primary: '#1f2937',
-        secondary: '#6b7280',
-        disabled: '#a7b1aa'
+        primary: '#16324A',
+        secondary: '#4D6475',
+        disabled: '#9CB0BF'
       },
       action: {
-        disabled: '#d8e3dc',
-        hover: 'rgba(0, 128, 64, 0.05)',
-        selected: 'rgba(0, 128, 64, 0.09)'
+        disabled: '#DFE8EF',
+        hover: 'rgba(0, 84, 159, 0.05)',
+        selected: 'rgba(0, 84, 159, 0.09)'
       },
-      divider: '#d8e3dc',
+      divider: '#DFE8EF',
       background: {
-        paper: '#ffffff',
-        default: '#f8faf9'
+        paper: '#FFFFFF',
+        default: '#F7FAFC'
       }
     }
   };

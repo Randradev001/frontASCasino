@@ -122,7 +122,7 @@ export default function Profile() {
                           <Stack>
                             <Typography variant="h6">{displayName}</Typography>
                             <Typography variant="body2" color="text.secondary">
-                              {company?.nombre || 'CONEX-CO'}
+                              {company?.nombre || 'Agrosuper'}
                             </Typography>
                           </Stack>
                         </Stack>

@@ -1,10 +1,9 @@
 {
-  "name": "conex-frontend",
+  "name": "adp-frontend",
   "version": "2.1.0",
   "homepage": "/free",
   "author": {
-    "name": "Conex",
-    "email": "soporte@conex.cl",
+    "name": "Agrosuper",
     "url": "/free"
   },
   "scripts": {
