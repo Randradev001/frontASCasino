@@ -11,6 +11,8 @@ const reactRoutesByGxCall = {
   'solicitapedido02.aspx': '/casino/pedidos/nuevo',
   'react.casinodashboard': '/casino/pedidos/historial',
   'react.casinohistory': '/casino/pedidos/historial',
+  'pedidoscasinostatus.aspx': '/casino/solicitudes',
+  'react.casinorequests': '/casino/solicitudes',
   'tsistemasww.aspx': '/seguridad/sistemas',
   'tmodulosww.aspx': '/seguridad/modulos',
   'tprogramww.aspx': '/seguridad/programas',

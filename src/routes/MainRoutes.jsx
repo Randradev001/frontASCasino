@@ -4,6 +4,7 @@ import Loadable from 'components/Loadable';
 import DashboardLayout from 'layout/Dashboard';
 import ProtectedRoute from './ProtectedRoute';
 import SecurityAdminRoute from './SecurityAdminRoute';
+import RouteErrorPage from './RouteErrorPage';
 
 const DashboardDefault = Loadable(lazy(() => import('pages/dashboard/default')));
 const SecurityCatalogPage = Loadable(lazy(() => import('pages/seguridad/SecurityCatalogPage')));
@@ -14,9 +15,11 @@ const PersonasPage = Loadable(lazy(() => import('pages/personas/PersonasPage')))
 const PersonaDetailPage = Loadable(lazy(() => import('pages/personas/PersonaDetailPage')));
 const NewOrderPage = Loadable(lazy(() => import('pages/casino/NewOrderPage')));
 const OrderHistoryPage = Loadable(lazy(() => import('pages/casino/OrderHistoryPage')));
+const CasinoRequestsPage = Loadable(lazy(() => import('pages/casino/CasinoRequestsPage')));
 
 const MainRoutes = {
   path: '/',
+  errorElement: <RouteErrorPage />,
   element: (
     <ProtectedRoute>
       <DashboardLayout />
@@ -29,6 +32,7 @@ const MainRoutes = {
     { path: 'personas/:rut', element: <PersonaDetailPage /> },
     { path: 'casino/pedidos/nuevo', element: <NewOrderPage /> },
     { path: 'casino/pedidos/historial', element: <OrderHistoryPage /> },
+    { path: 'casino/solicitudes', element: <CasinoRequestsPage /> },
     {
       path: 'seguridad/usuarios',
       element: (

@@ -60,7 +60,7 @@ export default defineConfig(({ mode }) => {
     ],
     build: {
       chunkSizeWarningLimit: 1000,
-      sourcemap: true,
+      sourcemap: mode !== 'production',
       cssCodeSplit: true,
       rollupOptions: {
         output: {
