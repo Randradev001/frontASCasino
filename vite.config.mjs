@@ -14,14 +14,11 @@ export default defineConfig(({ mode }) => {
     server: {
       open: true,
       port: PORT,
-      host: true
+      host: '127.0.0.1'
     },
     preview: {
       open: true,
-      host: true,
-      fs: {
-        allow: ['..']
-      }
+      host: '127.0.0.1'
     },
     define: {
       global: 'window'

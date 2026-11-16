@@ -1,0 +1,8 @@
+{
+  "name": "@adp/deepmerge",
+  "version": "4.3.1-adp.1",
+  "private": true,
+  "description": "Local security patch of deepmerge 4.3.1 for CVE-2026-93753",
+  "main": "index.cjs",
+  "license": "MIT"
+}
