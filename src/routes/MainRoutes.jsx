@@ -16,6 +16,10 @@ const PersonaDetailPage = Loadable(lazy(() => import('pages/personas/PersonaDeta
 const NewOrderPage = Loadable(lazy(() => import('pages/casino/NewOrderPage')));
 const OrderHistoryPage = Loadable(lazy(() => import('pages/casino/OrderHistoryPage')));
 const CasinoRequestsPage = Loadable(lazy(() => import('pages/casino/CasinoRequestsPage')));
+const CasinoMasterPage = Loadable(lazy(() => import('pages/casino/CasinoMasterPage')));
+const CasinoAnnualReportPage = Loadable(lazy(() => import('pages/casino/CasinoAnnualReportPage')));
+const CasinoGeneralDownloadPage = Loadable(lazy(() => import('pages/casino/CasinoGeneralDownloadPage')));
+const CasinoMailStatusPage = Loadable(lazy(() => import('pages/casino/CasinoMailStatusPage')));
 
 const MainRoutes = {
   path: '/',
@@ -33,6 +37,17 @@ const MainRoutes = {
     { path: 'casino/pedidos/nuevo', element: <NewOrderPage /> },
     { path: 'casino/pedidos/historial', element: <OrderHistoryPage /> },
     { path: 'casino/solicitudes', element: <CasinoRequestsPage /> },
+    { path: 'casino/maestros/casinos', element: <CasinoMasterPage catalog="casinos" /> },
+    { path: 'casino/maestros/destinos', element: <CasinoMasterPage catalog="destinos" /> },
+    { path: 'casino/maestros/motivos', element: <CasinoMasterPage catalog="motivos" /> },
+    { path: 'casino/maestros/tipos-producto', element: <CasinoMasterPage catalog="tipos-producto" /> },
+    { path: 'casino/maestros/productos', element: <CasinoMasterPage catalog="productos" /> },
+    { path: 'casino/consultas/tipo-producto', element: <CasinoAnnualReportPage report="tipo-producto" /> },
+    { path: 'casino/consultas/centro-costo', element: <CasinoAnnualReportPage report="centro-costo" /> },
+    { path: 'casino/consultas/persona', element: <CasinoAnnualReportPage report="persona" /> },
+    { path: 'casino/consultas/motivo', element: <CasinoAnnualReportPage report="motivo" /> },
+    { path: 'casino/consultas/descarga-general', element: <CasinoGeneralDownloadPage /> },
+    { path: 'casino/correos', element: <CasinoMailStatusPage /> },
     {
       path: 'seguridad/usuarios',
       element: (

@@ -15,3 +15,7 @@ export const approveCasinoRequest = async (number, payload) =>
 export const rejectCasinoRequest = async (number, payload) =>
   (await api.post(`${basePath}/${encodeURIComponent(number)}/rechazar`, payload)).data;
 export const deliverCasinoRequest = async (number) => (await api.post(`${basePath}/${encodeURIComponent(number)}/entregar`)).data;
+export const addCasinoOrderObservation = async (number, payload) =>
+  (await api.post(`${basePath}/${encodeURIComponent(number)}/observacion`, payload)).data;
+export const setCasinoPaymentControl = async (number, payload) =>
+  (await api.post(`${basePath}/${encodeURIComponent(number)}/control-pago`, payload)).data;

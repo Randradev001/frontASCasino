@@ -1,10 +1,10 @@
 {
   "name": "adp-frontend",
   "version": "2.1.0",
-  "homepage": "/free",
+  "homepage": "/casino",
   "author": {
     "name": "Agrosuper",
-    "url": "/free"
+    "url": "/casino"
   },
   "scripts": {
     "start": "vite",

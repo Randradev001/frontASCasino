@@ -32,7 +32,7 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { PieChart } from '@mui/x-charts/PieChart';
 
-import { getOrderHistoryDetail, getOrdersHistory } from 'api/casinoBiApi';
+import { evaluateCasinoOrder, getOrderHistoryDetail, getOrdersHistory } from 'api/casinoBiApi';
 
 const BLUE = '#00549F';
 const ORANGE = '#FF740C';
@@ -63,6 +63,8 @@ const shortDateTime = new Intl.DateTimeFormat('es-CL', {
 
 const formatDate = (value, withTime = false) => (value ? (withTime ? shortDateTime : shortDate).format(new Date(value)) : 'Sin fecha');
 const statusColor = (status) => ({ 0: 'default', 1: 'info', 2: 'warning', 3: 'success', 5: 'error' })[status] || 'default';
+const evaluationLabel = (value) => ({ 0: 'Sin evaluación', 1: 'Malo', 2: 'Regular', 3: 'Bueno' })[value] || 'Sin evaluación';
+const paymentLabel = (value) => ({ 0: 'Pendiente de evaluación', 1: 'Pago liberado', 2: 'Pago bloqueado' })[value] || 'Sin control';
 
 export default function OrderHistoryPage() {
   const navigate = useNavigate();
@@ -78,6 +80,9 @@ export default function OrderHistoryPage() {
   const [detail, setDetail] = useState(null);
   const [detailLoading, setDetailLoading] = useState(false);
   const [detailError, setDetailError] = useState('');
+  const [evaluationOpen, setEvaluationOpen] = useState(false);
+  const [evaluationForm, setEvaluationForm] = useState({ evaluation: 0, comment: '' });
+  const [evaluationSaving, setEvaluationSaving] = useState(false);
 
   const loadHistory = useCallback(async () => {
     setLoading(true);
@@ -143,6 +148,21 @@ export default function OrderHistoryPage() {
     setDetailNumber(null);
     setDetail(null);
     setDetailError('');
+  };
+
+  const submitEvaluation = async () => {
+    setEvaluationSaving(true);
+    setDetailError('');
+    try {
+      await evaluateCasinoOrder(detail.number, evaluationForm);
+      setEvaluationOpen(false);
+      await openDetail(detail.number);
+      await loadHistory();
+    } catch (requestError) {
+      setDetailError(requestError.response?.data?.message || 'No fue posible registrar la evaluación.');
+    } finally {
+      setEvaluationSaving(false);
+    }
   };
 
   return (
@@ -588,6 +608,40 @@ export default function OrderHistoryPage() {
                   <strong>Indicaciones:</strong> {detail.description}
                 </Alert>
               )}
+              <Paper variant="outlined" sx={{ p: 2 }}>
+                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} justifyContent="space-between">
+                  <Box>
+                    <Typography variant="caption" color="text.secondary">
+                      Evaluación del servicio
+                    </Typography>
+                    <Typography variant="h4">{evaluationLabel(detail.evaluation.value)}</Typography>
+                    {detail.evaluation.userComment && <Typography variant="body2">“{detail.evaluation.userComment}”</Typography>}
+                    {detail.evaluation.casinoComment && (
+                      <Typography variant="caption" display="block" color="text.secondary">
+                        Casino: {detail.evaluation.casinoComment}
+                      </Typography>
+                    )}
+                  </Box>
+                  <Box textAlign={{ sm: 'right' }}>
+                    <Chip
+                      color={detail.paymentControl === 2 ? 'error' : detail.paymentControl === 1 ? 'success' : 'default'}
+                      label={paymentLabel(detail.paymentControl)}
+                    />
+                    {detail.canEvaluate && (
+                      <Button
+                        sx={{ display: 'block', mt: 1, ml: { sm: 'auto' } }}
+                        variant="contained"
+                        onClick={() => {
+                          setEvaluationForm({ evaluation: detail.evaluation.value || 0, comment: detail.evaluation.userComment || '' });
+                          setEvaluationOpen(true);
+                        }}
+                      >
+                        {detail.evaluation.value ? 'Actualizar evaluación' : 'Evaluar pedido'}
+                      </Button>
+                    )}
+                  </Box>
+                </Stack>
+              </Paper>
               <TableContainer component={Paper} variant="outlined">
                 <Table size="small">
                   <TableHead>
@@ -643,6 +697,61 @@ export default function OrderHistoryPage() {
         </DialogContent>
         <DialogActions>
           <Button onClick={closeDetail}>Cerrar</Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog open={evaluationOpen} onClose={() => !evaluationSaving && setEvaluationOpen(false)} fullWidth maxWidth="sm">
+        <DialogTitle>¿Cómo estuvo el pedido #{detail?.number}?</DialogTitle>
+        <DialogContent dividers>
+          <Stack spacing={2}>
+            <Stack direction="row" spacing={1}>
+              {[
+                [1, '🙁', 'Malo'],
+                [2, '😐', 'Regular'],
+                [3, '🙂', 'Bueno']
+              ].map(([value, icon, label]) => (
+                <Button
+                  key={value}
+                  fullWidth
+                  variant={evaluationForm.evaluation === value ? 'contained' : 'outlined'}
+                  color={value === 1 ? 'error' : value === 2 ? 'warning' : 'success'}
+                  onClick={() => setEvaluationForm((current) => ({ ...current, evaluation: value }))}
+                  sx={{ py: 1.5, flexDirection: 'column', fontSize: 18 }}
+                >
+                  {icon}
+                  <Typography variant="caption" color="inherit">
+                    {label}
+                  </Typography>
+                </Button>
+              ))}
+            </Stack>
+            <TextField
+              multiline
+              minRows={3}
+              label={evaluationForm.evaluation <= 2 ? 'Cuéntanos qué ocurrió (obligatorio)' : 'Comentario opcional'}
+              value={evaluationForm.comment}
+              onChange={(event) => setEvaluationForm((current) => ({ ...current, comment: event.target.value }))}
+              inputProps={{ maxLength: 200 }}
+              helperText={`${evaluationForm.comment.length}/200`}
+            />
+            <Alert severity="info">
+              Malo bloquea el pago automáticamente; Regular o Bueno lo liberan. El Casino puede revisarlo dejando trazabilidad.
+            </Alert>
+            {detailError && <Alert severity="error">{detailError}</Alert>}
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setEvaluationOpen(false)} disabled={evaluationSaving}>
+            Cancelar
+          </Button>
+          <Button
+            variant="contained"
+            onClick={submitEvaluation}
+            disabled={
+              evaluationSaving || !evaluationForm.evaluation || (evaluationForm.evaluation <= 2 && evaluationForm.comment.trim().length < 3)
+            }
+          >
+            {evaluationSaving ? 'Guardando…' : 'Guardar evaluación'}
+          </Button>
         </DialogActions>
       </Dialog>
     </Stack>

@@ -34,12 +34,14 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 
 import {
+  addCasinoOrderObservation,
   approveCasinoRequest,
   deliverCasinoRequest,
   getCasinoRequestDetail,
   getCasinoRequests,
   getRequesterCasinoHistory,
-  rejectCasinoRequest
+  rejectCasinoRequest,
+  setCasinoPaymentControl
 } from 'api/casinoSolicitudesApi';
 
 const BLUE = '#00549F';
@@ -58,6 +60,8 @@ const dateTimeFormat = new Intl.DateTimeFormat('es-CL', {
 
 const formatDate = (value, withTime = false) => (value ? (withTime ? dateTimeFormat : dateFormat).format(new Date(value)) : 'Sin fecha');
 const statusColor = (status) => ({ 1: 'info', 2: 'warning', 3: 'success', 5: 'error' })[status] || 'default';
+const evaluationLabel = (value) => ({ 0: 'Sin evaluación', 1: 'Malo', 2: 'Regular', 3: 'Bueno' })[value] || 'Sin evaluación';
+const paymentLabel = (value) => ({ 0: 'Pendiente de evaluación', 1: 'Pago liberado', 2: 'Pago bloqueado' })[value] || 'Sin control';
 const inputDate = (value) => (value ? new Date(value).toISOString().slice(0, 10) : '');
 const inputTime = (value) => (value ? new Date(value).toISOString().slice(11, 16) : '');
 const timingAt = (scheduledAt, actualAt) => {
@@ -123,6 +127,36 @@ const DetailBody = ({ detail }) => (
         {formatDate(detail.delivery.actualAt, true)}.
       </Alert>
     )}
+    <Paper variant="outlined" sx={{ p: 2 }}>
+      <Grid container spacing={2}>
+        <Grid size={{ xs: 12, sm: 6 }}>
+          <Typography variant="caption" color="text.secondary">
+            Evaluación del usuario
+          </Typography>
+          <Typography variant="h4">{evaluationLabel(detail.evaluation.value)}</Typography>
+          {detail.evaluation.userComment && <Typography variant="body2">“{detail.evaluation.userComment}”</Typography>}
+        </Grid>
+        <Grid size={{ xs: 12, sm: 6 }}>
+          <Typography variant="caption" color="text.secondary">
+            Control de pago
+          </Typography>
+          <Box sx={{ mt: 0.5 }}>
+            <Chip
+              color={detail.paymentControl === 2 ? 'error' : detail.paymentControl === 1 ? 'success' : 'default'}
+              label={paymentLabel(detail.paymentControl)}
+            />
+          </Box>
+        </Grid>
+        {detail.evaluation.casinoComment && (
+          <Grid size={12}>
+            <Typography variant="caption" color="text.secondary">
+              Observación del Casino
+            </Typography>
+            <Typography variant="body2">{detail.evaluation.casinoComment}</Typography>
+          </Grid>
+        )}
+      </Grid>
+    </Paper>
     <TableContainer component={Paper} variant="outlined">
       <Table size="small">
         <TableHead>
@@ -197,6 +231,8 @@ export default function CasinoRequestsPage() {
   const [currentMoment, setCurrentMoment] = useState(new Date());
   const [decisionForm, setDecisionForm] = useState({ deliveryDate: '', deliveryTime: '', comment: '' });
   const [saving, setSaving] = useState(false);
+  const [evaluationAction, setEvaluationAction] = useState(null);
+  const [evaluationComment, setEvaluationComment] = useState('');
 
   const loadRequests = useCallback(async () => {
     setLoading(true);
@@ -297,6 +333,33 @@ export default function CasinoRequestsPage() {
   };
 
   const currentTiming = deliveryOrder ? timingAt(deliveryOrder.deliveryTime, currentMoment) : null;
+
+  const submitEvaluationAction = async () => {
+    setSaving(true);
+    setDialogError('');
+    try {
+      if (evaluationAction.type === 'observation')
+        await addCasinoOrderObservation(evaluationAction.order.number, { comment: evaluationComment });
+      else
+        await setCasinoPaymentControl(evaluationAction.order.number, {
+          paymentControl: evaluationAction.type === 'release' ? 1 : 2,
+          comment: evaluationComment
+        });
+      setNotice(
+        evaluationAction.type === 'observation'
+          ? 'Observación registrada.'
+          : `Control actualizado: ${evaluationAction.type === 'release' ? 'pago liberado' : 'pago bloqueado'}.`
+      );
+      setEvaluationAction(null);
+      setEvaluationComment('');
+      if (detailNumber) await openDetail(detailNumber);
+      await loadRequests();
+    } catch (requestError) {
+      setDialogError(requestError.response?.data?.message || 'No fue posible registrar el cambio.');
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <Stack spacing={2.5}>
@@ -565,7 +628,82 @@ export default function CasinoRequestsPage() {
           {detail && <DetailBody detail={detail} />}
         </DialogContent>
         <DialogActions>
+          {detail?.canManagePayment && (
+            <>
+              <Button
+                onClick={() => {
+                  setEvaluationAction({ type: 'observation', order: detail });
+                  setEvaluationComment(detail.evaluation.casinoComment || '');
+                }}
+              >
+                Observación
+              </Button>
+              <Button
+                color="success"
+                onClick={() => {
+                  setEvaluationAction({ type: 'release', order: detail });
+                  setEvaluationComment('');
+                }}
+              >
+                Liberar pago
+              </Button>
+              <Button
+                color="error"
+                onClick={() => {
+                  setEvaluationAction({ type: 'block', order: detail });
+                  setEvaluationComment('');
+                }}
+              >
+                Bloquear pago
+              </Button>
+            </>
+          )}
           <Button onClick={() => setDetailNumber(null)}>Cerrar</Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={Boolean(evaluationAction)} onClose={() => !saving && setEvaluationAction(null)} fullWidth maxWidth="sm">
+        <DialogTitle>
+          {evaluationAction?.type === 'observation'
+            ? 'Observación del Casino'
+            : evaluationAction?.type === 'release'
+              ? 'Liberar pago'
+              : 'Bloquear pago'}
+        </DialogTitle>
+        <DialogContent dividers>
+          <Stack spacing={2}>
+            {evaluationAction?.type !== 'observation' && (
+              <Alert severity={evaluationAction?.type === 'block' ? 'warning' : 'info'}>
+                {evaluationAction?.type === 'block'
+                  ? 'El motivo es obligatorio y quedará en el historial.'
+                  : 'La liberación quedará auditada con su usuario y fecha.'}
+              </Alert>
+            )}
+            <TextField
+              autoFocus
+              multiline
+              minRows={3}
+              label={evaluationAction?.type === 'block' ? 'Motivo obligatorio' : 'Comentario'}
+              value={evaluationComment}
+              onChange={(event) => setEvaluationComment(event.target.value)}
+              inputProps={{ maxLength: 200 }}
+              helperText={`${evaluationComment.length}/200`}
+            />
+            {dialogError && <Alert severity="error">{dialogError}</Alert>}
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setEvaluationAction(null)} disabled={saving}>
+            Cancelar
+          </Button>
+          <Button
+            variant="contained"
+            color={evaluationAction?.type === 'block' ? 'error' : 'primary'}
+            onClick={submitEvaluationAction}
+            disabled={saving || (evaluationAction?.type !== 'release' && evaluationComment.trim().length < 3)}
+          >
+            {saving ? 'Guardando…' : 'Confirmar'}
+          </Button>
         </DialogActions>
       </Dialog>
 

@@ -42,8 +42,8 @@ export default defineConfig(({ mode }) => {
           theme_color: '#00549F',
           background_color: '#FFFFFF',
           display: 'standalone',
-          start_url: '/free/',
-          scope: '/free/',
+          start_url: '/casino/',
+          scope: '/casino/',
           icons: [
             {
               src: 'favicon.svg',

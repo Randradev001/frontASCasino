@@ -14,4 +14,7 @@ export const getOrdersHistory = async (params = {}) =>
 export const getOrderHistoryDetail = async (number) =>
   (await api.get(`/backendDocker/casino/bi/pedidos/${encodeURIComponent(number)}`)).data;
 
+export const evaluateCasinoOrder = async (number, payload) =>
+  (await api.post(`/backendDocker/casino/pedidos/${encodeURIComponent(number)}/evaluacion`, payload)).data;
+
 export const getSecuritySummary = async () => (await api.get('/backendDocker/seguridad/resumen')).data;

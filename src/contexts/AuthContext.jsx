@@ -26,6 +26,12 @@ export function AuthProvider({ children }) {
     refreshSession();
   }, [refreshSession]);
 
+  useEffect(() => {
+    const clearExpiredSession = () => setSession(null);
+    window.addEventListener('casino:unauthenticated', clearExpiredSession);
+    return () => window.removeEventListener('casino:unauthenticated', clearExpiredSession);
+  }, []);
+
   const login = useCallback(async (credentials) => {
     const result = await authApi.login(credentials);
     if (!result.requiresCompany) setSession({ ...result, authenticated: true });

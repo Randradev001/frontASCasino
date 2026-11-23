@@ -17,7 +17,13 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const container = document.getElementById('root');
 const root = createRoot(container);
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: (failureCount, error) => error?.response?.status !== 401 && failureCount < 3
+    }
+  }
+});
 
 root.render(
   <QueryClientProvider client={queryClient}>

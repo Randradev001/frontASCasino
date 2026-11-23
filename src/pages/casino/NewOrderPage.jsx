@@ -472,6 +472,11 @@ export default function NewOrderPage() {
           {error}
         </Alert>
       )}
+      <Alert severity={orderContext.canAccessRestrictedProducts ? 'success' : 'info'}>
+        {orderContext.canAccessRestrictedProducts
+          ? 'Tienes acceso al catálogo completo, incluidos los tipos de producto restringidos.'
+          : 'El catálogo muestra productos liberados. Los tipos restringidos requieren el permiso adicional 55/1/91.'}
+      </Alert>
 
       <Grid container spacing={2.5} alignItems="flex-start">
         <Grid size={{ xs: 12, lg: 8 }}>

@@ -29,18 +29,6 @@ import UserOutlined from '@ant-design/icons/UserOutlined';
 import LockOutlined from '@ant-design/icons/LockOutlined';
 import ArrowRightOutlined from '@ant-design/icons/ArrowRightOutlined';
 
-const formatRut = (value) => {
-  const normalized = String(value || '')
-    .toUpperCase()
-    .replace(/[^0-9K]/g, '')
-    .slice(0, 10);
-  if (normalized.length <= 1) return normalized;
-
-  const body = normalized.slice(0, -1);
-  const verifier = normalized.slice(-1);
-  return `${body.replace(/\B(?=(\d{3})+(?!\d))/g, '.')}-${verifier}`;
-};
-
 export default function AuthLogin({ isDemo = false }) {
   const [remember, setRemember] = React.useState(false);
   const [showPassword, setShowPassword] = React.useState(false);
@@ -51,9 +39,13 @@ export default function AuthLogin({ isDemo = false }) {
 
   return (
     <Formik
-      initialValues={{ rut: '', password: '', empCod: '', submit: null }}
+      initialValues={{ email: '', password: '', empCod: '', submit: null }}
       validationSchema={Yup.object({
-        rut: Yup.string().trim().max(13, 'El RUT es demasiado extenso').required('El RUT es obligatorio'),
+        email: Yup.string()
+          .trim()
+          .email('Ingrese un correo válido')
+          .max(254, 'El correo es demasiado extenso')
+          .required('El correo es obligatorio'),
         password: Yup.string().max(128, 'La clave es demasiado extensa').required('La clave es obligatoria'),
         empCod: companies.length ? Yup.number().required('Seleccione una empresa') : Yup.mixed()
       })}
@@ -72,7 +64,7 @@ export default function AuthLogin({ isDemo = false }) {
         }
       }}
     >
-      {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, setFieldValue, touched, values }) => (
+      {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values }) => (
         <form noValidate onSubmit={handleSubmit}>
           <Grid container spacing={2.5}>
             {errors.submit && (
@@ -82,19 +74,20 @@ export default function AuthLogin({ isDemo = false }) {
             )}
             <Grid size={12}>
               <Stack sx={{ gap: 1 }}>
-                <InputLabel htmlFor="user-rut">RUT</InputLabel>
+                <InputLabel htmlFor="user-email">Correo</InputLabel>
                 <OutlinedInput
-                  id="user-rut"
-                  name="rut"
-                  value={values.rut}
+                  id="user-email"
+                  name="email"
+                  value={values.email}
                   onBlur={handleBlur}
-                  onChange={(event) => setFieldValue('rut', formatRut(event.target.value))}
-                  placeholder="12.345.678-5"
+                  onChange={handleChange}
+                  type="email"
+                  placeholder="nombre@empresa.cl"
                   autoComplete="username"
-                  inputProps={{ maxLength: 13 }}
+                  inputProps={{ maxLength: 254 }}
                   disabled={companies.length > 0}
                   fullWidth
-                  error={Boolean(touched.rut && errors.rut)}
+                  error={Boolean(touched.email && errors.email)}
                   startAdornment={
                     <InputAdornment position="start">
                       <UserOutlined aria-hidden="true" />
@@ -103,7 +96,7 @@ export default function AuthLogin({ isDemo = false }) {
                   sx={{ height: 52, bgcolor: 'background.paper' }}
                 />
               </Stack>
-              {touched.rut && errors.rut && <FormHelperText error>{errors.rut}</FormHelperText>}
+              {touched.email && errors.email && <FormHelperText error>{errors.email}</FormHelperText>}
             </Grid>
             <Grid size={12}>
               <Stack sx={{ gap: 1 }}>
