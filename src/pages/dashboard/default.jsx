@@ -29,6 +29,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import TextField from '@mui/material/TextField';
+import ChileDatePicker from 'components/ChileDatePicker';
 import Typography from '@mui/material/Typography';
 import { BarChart } from '@mui/x-charts/BarChart';
 import { LineChart } from '@mui/x-charts/LineChart';
@@ -262,25 +263,19 @@ export default function DashboardDefault() {
               </TextField>
             </Grid>
             <Grid size={{ xs: 6, sm: 3, lg: 2 }}>
-              <TextField
+              <ChileDatePicker
                 fullWidth
-                size="small"
                 label="Desde"
-                type="date"
                 value={draftFilters.from}
-                slotProps={{ inputLabel: { shrink: true } }}
-                onChange={(event) => setDraftFilters((current) => ({ ...current, from: event.target.value }))}
+                onChange={(value) => setDraftFilters((current) => ({ ...current, from: value }))}
               />
             </Grid>
             <Grid size={{ xs: 6, sm: 3, lg: 2 }}>
-              <TextField
+              <ChileDatePicker
                 fullWidth
-                size="small"
                 label="Hasta"
-                type="date"
                 value={draftFilters.to}
-                slotProps={{ inputLabel: { shrink: true } }}
-                onChange={(event) => setDraftFilters((current) => ({ ...current, to: event.target.value }))}
+                onChange={(value) => setDraftFilters((current) => ({ ...current, to: value }))}
               />
             </Grid>
             <Grid size={{ xs: 12, sm: 2, lg: 5 }}>

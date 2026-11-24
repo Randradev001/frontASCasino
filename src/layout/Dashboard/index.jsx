@@ -13,6 +13,7 @@ import Loader from 'components/Loader';
 import Breadcrumbs from 'components/@extended/Breadcrumbs';
 
 import { handlerDrawerOpen, useGetMenuMaster } from 'api/menu';
+import { DRAWER_WIDTH } from 'config';
 
 // ==============================|| MAIN LAYOUT ||============================== //
 
@@ -37,7 +38,7 @@ export default function DashboardLayout() {
       <Header />
       <Drawer />
 
-      <Box component="main" sx={{ width: 'calc(100% - 260px)', flexGrow: 1, p: { xs: 2, sm: 3 } }}>
+      <Box component="main" sx={{ width: `calc(100% - ${DRAWER_WIDTH}px)`, flexGrow: 1, p: { xs: 2, sm: 3 } }}>
         <Toolbar sx={{ mt: 'inherit' }} />
         <Box
           sx={{

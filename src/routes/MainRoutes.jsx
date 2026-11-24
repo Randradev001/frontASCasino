@@ -20,6 +20,8 @@ const CasinoMasterPage = Loadable(lazy(() => import('pages/casino/CasinoMasterPa
 const CasinoAnnualReportPage = Loadable(lazy(() => import('pages/casino/CasinoAnnualReportPage')));
 const CasinoGeneralDownloadPage = Loadable(lazy(() => import('pages/casino/CasinoGeneralDownloadPage')));
 const CasinoMailStatusPage = Loadable(lazy(() => import('pages/casino/CasinoMailStatusPage')));
+const CasinoLoadPage = Loadable(lazy(() => import('pages/casino/CasinoLoadPage')));
+const CasinoRequestersPage = Loadable(lazy(() => import('pages/casino/CasinoRequestersPage')));
 
 const MainRoutes = {
   path: '/',
@@ -42,6 +44,8 @@ const MainRoutes = {
     { path: 'casino/maestros/motivos', element: <CasinoMasterPage catalog="motivos" /> },
     { path: 'casino/maestros/tipos-producto', element: <CasinoMasterPage catalog="tipos-producto" /> },
     { path: 'casino/maestros/productos', element: <CasinoMasterPage catalog="productos" /> },
+    { path: 'casino/maestros/solicitantes', element: <CasinoRequestersPage /> },
+    { path: 'casino/cargas', element: <CasinoLoadPage /> },
     { path: 'casino/consultas/tipo-producto', element: <CasinoAnnualReportPage report="tipo-producto" /> },
     { path: 'casino/consultas/centro-costo', element: <CasinoAnnualReportPage report="centro-costo" /> },
     { path: 'casino/consultas/persona', element: <CasinoAnnualReportPage report="persona" /> },

@@ -29,6 +29,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import TextField from '@mui/material/TextField';
+import ChileDatePicker from 'components/ChileDatePicker';
 import Typography from '@mui/material/Typography';
 import { PieChart } from '@mui/x-charts/PieChart';
 
@@ -251,25 +252,19 @@ export default function OrderHistoryPage() {
             />
           </Grid>
           <Grid size={{ xs: 6, md: 2 }}>
-            <TextField
+            <ChileDatePicker
               fullWidth
-              size="small"
-              type="date"
               label="Desde"
               value={draftFilters.from}
-              slotProps={{ inputLabel: { shrink: true } }}
-              onChange={(event) => setDraftFilters((current) => ({ ...current, from: event.target.value }))}
+              onChange={(value) => setDraftFilters((current) => ({ ...current, from: value }))}
             />
           </Grid>
           <Grid size={{ xs: 6, md: 2 }}>
-            <TextField
+            <ChileDatePicker
               fullWidth
-              size="small"
-              type="date"
               label="Hasta"
               value={draftFilters.to}
-              slotProps={{ inputLabel: { shrink: true } }}
-              onChange={(event) => setDraftFilters((current) => ({ ...current, to: event.target.value }))}
+              onChange={(value) => setDraftFilters((current) => ({ ...current, to: value }))}
             />
           </Grid>
           <Grid size={{ xs: 6, md: 2 }}>

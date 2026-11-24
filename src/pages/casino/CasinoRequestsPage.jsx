@@ -31,6 +31,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import TextField from '@mui/material/TextField';
+import ChileDatePicker from 'components/ChileDatePicker';
 import Typography from '@mui/material/Typography';
 
 import {
@@ -824,12 +825,11 @@ export default function CasinoRequestsPage() {
             {decision?.type === 'approve' ? (
               <>
                 <Alert severity="info">Confirma la fecha y hora comprometidas antes de pasar el pedido a preparación.</Alert>
-                <TextField
-                  type="date"
+                <ChileDatePicker
                   label="Fecha de entrega"
                   value={decisionForm.deliveryDate}
-                  onChange={(event) => setDecisionForm((current) => ({ ...current, deliveryDate: event.target.value }))}
-                  slotProps={{ inputLabel: { shrink: true } }}
+                  onChange={(value) => setDecisionForm((current) => ({ ...current, deliveryDate: value }))}
+                  clearable={false}
                   required
                 />
                 <TextField

@@ -23,6 +23,7 @@ import CloseOutlined from '@ant-design/icons/CloseOutlined';
 import EyeOutlined from '@ant-design/icons/EyeOutlined';
 import SearchOutlined from '@ant-design/icons/SearchOutlined';
 import FilterClearAdornment from 'components/FilterClearAdornment';
+import ChileDatePicker from 'components/ChileDatePicker';
 import ListExportButtons from 'components/ListExportButtons';
 import OperationalListHero from 'components/OperationalListHero';
 import OperationalListShell from 'components/OperationalListShell';
@@ -239,22 +240,8 @@ export default function CasinoGeneralDownloadPage() {
           ))}
         </Grid>
         <Stack direction="row" useFlexGap flexWrap="wrap" spacing={1}>
-          <TextField
-            size="small"
-            type="date"
-            label="Desde"
-            sx={{ width: 165 }}
-            {...filterProps('from')}
-            slotProps={{ inputLabel: { shrink: true }, input: filterProps('from').slotProps.input }}
-          />
-          <TextField
-            size="small"
-            type="date"
-            label="Hasta"
-            sx={{ width: 165 }}
-            {...filterProps('to')}
-            slotProps={{ inputLabel: { shrink: true }, input: filterProps('to').slotProps.input }}
-          />
+          <ChileDatePicker label="Desde" sx={{ width: 165 }} value={filters.from} onChange={(value) => setFilter('from', value)} />
+          <ChileDatePicker label="Hasta" sx={{ width: 165 }} value={filters.to} onChange={(value) => setFilter('to', value)} />
           <TextField select size="small" label="Casino" sx={{ minWidth: 185 }} {...filterProps('casinoId')}>
             <MenuItem value="">Todos</MenuItem>
             {selectOptions(catalogs.casinos)}

@@ -26,24 +26,25 @@ import InputAdornment from '@mui/material/InputAdornment';
 import OperationalListShell from 'components/OperationalListShell';
 import OperationalListHero from 'components/OperationalListHero';
 import ListExportButtons from 'components/ListExportButtons';
+import ChileDatePicker from 'components/ChileDatePicker';
 import { getCasinoAnnualReport } from 'api/casinoConsultasApi';
 
-const MONTHS = [
-  'Enero',
-  'Febrero',
-  'Marzo',
-  'Abril',
-  'Mayo',
-  'Junio',
-  'Julio',
-  'Agosto',
-  'Septiembre',
-  'Octubre',
-  'Noviembre',
-  'Diciembre'
-];
 const money = new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 });
 const integer = new Intl.NumberFormat('es-CL');
+const periodFormatter = new Intl.DateTimeFormat('es-CL', { month: 'short', year: 'numeric', timeZone: 'UTC' });
+const toInputDate = (date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+const initialRange = () => {
+  const to = new Date();
+  const from = new Date(to);
+  from.setDate(from.getDate() - 30);
+  return { from: toInputDate(from), to: toInputDate(to) };
+};
+const periodLabel = (value) => periodFormatter.format(new Date(`${value}-01T00:00:00Z`)).replace('.', '');
 const CONFIG = {
   'tipo-producto': {
     title: 'Pedidos por tipo de producto',
@@ -104,7 +105,7 @@ Toolbar.propTypes = { search: PropTypes.string.isRequired, setSearch: PropTypes.
 export default function CasinoAnnualReportPage({ report }) {
   const config = CONFIG[report];
   const [filters, setFilters] = useState({
-    year: new Date().getFullYear(),
+    ...initialRange(),
     casinoId: '',
     categoryId: '',
     motiveId: '',
@@ -117,6 +118,7 @@ export default function CasinoAnnualReportPage({ report }) {
   const params = useMemo(() => ({ ...filters, q: search.trim() }), [filters, search]);
   const query = useQuery({ queryKey: ['casino-annual-report', report, params], queryFn: () => getCasinoAnnualReport(report, params) });
   const rows = query.data?.rows || [];
+  const periods = query.data?.periods || [];
   const columns = [
     {
       field: 'actions',
@@ -132,10 +134,10 @@ export default function CasinoAnnualReportPage({ report }) {
       )
     },
     { field: 'label', headerName: config.label, minWidth: 230, flex: 1 },
-    ...MONTHS.map((name, index) => ({
-      field: `m${String(index + 1).padStart(2, '0')}`,
-      headerName: name.slice(0, 3),
-      width: 112,
+    ...periods.map((period) => ({
+      field: period.key,
+      headerName: periodLabel(period.value),
+      width: 125,
       type: 'number',
       valueFormatter: (value) => money.format(value)
     })),
@@ -164,10 +166,10 @@ export default function CasinoAnnualReportPage({ report }) {
         subtitle={config.subtitle}
         actions={
           <ListExportButtons
-            title={`${config.title} ${filters.year}`}
+            title={config.title}
             rows={rows}
             columns={exportColumns}
-            filters={[`Año: ${filters.year}`, 'Estado: Entregado']}
+            filters={[`Desde: ${filters.from || 'Sin límite'}`, `Hasta: ${filters.to || 'Sin límite'}`, 'Estado: Entregado']}
             disabled={query.isFetching}
             onNotify={(value) => setNotice({ open: true, ...value })}
           />
@@ -189,14 +191,8 @@ export default function CasinoAnnualReportPage({ report }) {
           ))}
         </Grid>
         <Stack direction={{ xs: 'column', lg: 'row' }} spacing={1}>
-          <TextField
-            size="small"
-            type="number"
-            label="Año"
-            value={filters.year}
-            onChange={(event) => setFilter('year', event.target.value)}
-            sx={{ width: 130 }}
-          />
+          <ChileDatePicker label="Desde" value={filters.from} onChange={(value) => setFilter('from', value)} sx={{ width: 175 }} />
+          <ChileDatePicker label="Hasta" value={filters.to} onChange={(value) => setFilter('to', value)} sx={{ width: 175 }} />
           {config.filters.includes('casinoId') && (
             <TextField
               select
@@ -291,7 +287,7 @@ export default function CasinoAnnualReportPage({ report }) {
               pagination: { paginationModel: { pageSize: 25 } },
               pinnedColumns: { left: ['actions', 'label'], right: ['total'] }
             }}
-            sx={{ minWidth: 1750, '& .MuiDataGrid-columnHeaders': { bgcolor: '#edf5fb' } }}
+            sx={{ minWidth: Math.max(650, 455 + periods.length * 125), '& .MuiDataGrid-columnHeaders': { bgcolor: '#edf5fb' } }}
           />
         </Box>
       </Stack>
@@ -299,10 +295,10 @@ export default function CasinoAnnualReportPage({ report }) {
         <DialogTitle>{detail?.label}</DialogTitle>
         <DialogContent>
           <Stack spacing={0.5}>
-            {MONTHS.map((month, index) => (
-              <Stack key={month} direction="row" justifyContent="space-between">
-                <Typography>{month}</Typography>
-                <Typography fontWeight={700}>{money.format(detail?.[`m${String(index + 1).padStart(2, '0')}`] || 0)}</Typography>
+            {periods.map((period) => (
+              <Stack key={period.key} direction="row" justifyContent="space-between">
+                <Typography>{periodLabel(period.value)}</Typography>
+                <Typography fontWeight={700}>{money.format(detail?.[period.key] || 0)}</Typography>
               </Stack>
             ))}
           </Stack>

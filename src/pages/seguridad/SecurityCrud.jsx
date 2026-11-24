@@ -33,12 +33,14 @@ import KeyOutlined from '@ant-design/icons/KeyOutlined';
 
 import { Formik } from 'formik';
 import * as Yup from 'yup';
+import moment from 'moment';
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 
 import ListExportButtons from 'components/ListExportButtons';
 import MainCard from 'components/MainCard';
+import ChileDatePicker from 'components/ChileDatePicker';
 import { deleteSecurityCatalog, insertSecurityCatalog, listSecurityCatalog, updateSecurityCatalog } from 'api/seguridadCatalogosApi';
 import { useAuth } from 'contexts/AuthContext';
 import { gxSecurityConfig } from './gxSecurityConfig';
@@ -70,11 +72,8 @@ const toFormValue = (field, value) => {
   if (!isFilled(value)) return '';
 
   if (field.type === 'date') {
-    const dateValue = value instanceof Date ? value : new Date(value);
-
-    if (Number.isNaN(dateValue.getTime())) return String(value);
-
-    return dateValue.toISOString().slice(0, 10);
+    const dateValue = moment(value);
+    return dateValue.isValid() ? dateValue.format('YYYY-MM-DD') : String(value);
   }
 
   return String(value);
@@ -92,11 +91,8 @@ const formatCellValue = (field, value) => {
   if (!isFilled(value)) return '';
 
   if (field.type === 'date') {
-    const dateValue = new Date(value);
-
-    if (Number.isNaN(dateValue.getTime())) return String(value);
-
-    return dateValue.toLocaleDateString('es-CL');
+    const dateValue = moment(value);
+    return dateValue.isValid() ? dateValue.locale('es').format('DD/MM/YYYY') : String(value);
   }
 
   if (field.type === 'decimal') {
@@ -339,6 +335,28 @@ const MaestroForm = ({ config, mode, initialData, fixedValues, optionSets, isSub
                             )
                           }}
                         />
+                      ) : field.type === 'date' ? (
+                        <ChileDatePicker
+                          fullWidth
+                          label={displayLabel}
+                          value={values[field.name]}
+                          onChange={(value) => {
+                            setFieldValue(field.name, value);
+                            setFieldTouched(field.name, true, false);
+                          }}
+                          disabled={disabled}
+                          required={isRequired}
+                          clearable={!isRequired}
+                          slotProps={{
+                            textField: {
+                              id: field.name,
+                              name: field.name,
+                              onBlur: handleBlur,
+                              error: Boolean(touched[field.name] && errors[field.name]),
+                              helperText: touched[field.name] && errors[field.name] ? errors[field.name] : ''
+                            }
+                          }}
+                        />
                       ) : (
                         <TextField
                           fullWidth
@@ -362,7 +380,6 @@ const MaestroForm = ({ config, mode, initialData, fixedValues, optionSets, isSub
                             ...(field.min !== undefined ? { min: field.min } : {}),
                             ...(field.exclusiveMin !== undefined ? { min: Number(field.exclusiveMin) + 0.0001 } : {})
                           }}
-                          InputLabelProps={field.type === 'date' ? { shrink: true } : undefined}
                         >
                           {hasSelectOptions && !isRequired && (
                             <MenuItem value="">

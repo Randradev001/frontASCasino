@@ -29,6 +29,7 @@ import ReloadOutlined from '@ant-design/icons/ReloadOutlined';
 import SearchOutlined from '@ant-design/icons/SearchOutlined';
 import SendOutlined from '@ant-design/icons/SendOutlined';
 import FilterClearAdornment from 'components/FilterClearAdornment';
+import ChileDatePicker from 'components/ChileDatePicker';
 import ListExportButtons from 'components/ListExportButtons';
 import OperationalListHero from 'components/OperationalListHero';
 import OperationalListShell from 'components/OperationalListShell';
@@ -246,24 +247,8 @@ export default function CasinoMailStatusPage() {
           ))}
         </Grid>
         <Stack direction="row" useFlexGap flexWrap="wrap" spacing={1}>
-          <TextField
-            size="small"
-            type="date"
-            label="Desde"
-            value={filters.from}
-            onChange={(e) => setFilter('from', e.target.value)}
-            sx={{ width: 165 }}
-            slotProps={{ inputLabel: { shrink: true }, input: { endAdornment: clear('from') } }}
-          />
-          <TextField
-            size="small"
-            type="date"
-            label="Hasta"
-            value={filters.to}
-            onChange={(e) => setFilter('to', e.target.value)}
-            sx={{ width: 165 }}
-            slotProps={{ inputLabel: { shrink: true }, input: { endAdornment: clear('to') } }}
-          />
+          <ChileDatePicker label="Desde" value={filters.from} onChange={(value) => setFilter('from', value)} sx={{ width: 165 }} />
+          <ChileDatePicker label="Hasta" value={filters.to} onChange={(value) => setFilter('to', value)} sx={{ width: 165 }} />
           <TextField
             select
             size="small"

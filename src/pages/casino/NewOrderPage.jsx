@@ -34,6 +34,7 @@ import Paper from '@mui/material/Paper';
 import Snackbar from '@mui/material/Snackbar';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
+import ChileDatePicker from 'components/ChileDatePicker';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 
@@ -45,7 +46,7 @@ import pastryImage from 'assets/images/products/pastry.webp';
 import sandwichesImage from 'assets/images/products/sandwiches.webp';
 import utensilsImage from 'assets/images/products/utensils.webp';
 import { createOrderDraft, getOrderContext, sendOrder } from 'api/casinoPedidosApi';
-import { listPersonas } from 'api/personasApi';
+import { listCasinoRequesters } from 'api/casinoSolicitantesApi';
 
 const BLUE = '#00549F';
 const ORANGE = '#FF740C';
@@ -86,9 +87,15 @@ const getMissingLocationFields = (requester) => {
   if (Array.isArray(requester?.missingLocationFields)) return requester.missingLocationFields;
   const location = requester?.location || {};
   return [
-    !(location.divisionId || location.division || requester?.division) ? { key: 'division', label: 'División' } : null,
-    !(location.subdivisionId || location.subdivision || requester?.subdivision) ? { key: 'subdivision', label: 'Subdivisión' } : null,
-    !(location.costCenterId || location.costCenter || requester?.centroCosto) ? { key: 'costCenter', label: 'Centro de costo' } : null
+    !(location.divisionId || location.division || requester?.divisionCode || requester?.divisionName || requester?.division)
+      ? { key: 'division', label: 'División' }
+      : null,
+    !(location.subdivisionId || location.subdivision || requester?.subdivisionCode || requester?.subdivisionName || requester?.subdivision)
+      ? { key: 'subdivision', label: 'Subdivisión' }
+      : null,
+    !(location.costCenterId || location.costCenter || requester?.costCenterCode || requester?.costCenterName || requester?.centroCosto)
+      ? { key: 'costCenter', label: 'Centro de costo' }
+      : null
   ].filter(Boolean);
 };
 
@@ -237,15 +244,19 @@ export default function NewOrderPage() {
   useEffect(() => {
     getOrderContext()
       .then((response) => {
+        const initialCasino =
+          response.catalogs.casinos.find((casino) => response.catalogs.products.some((product) => product.casinoId === casino.id)) ||
+          response.catalogs.casinos[0];
         setOrderContext(response);
         setSelectedRequester(response.requester);
         setForm((current) => ({
           ...current,
-          requesterRut: response.requester.rut,
-          casinoId: response.catalogs.casinos[0]?.id || '',
+          requesterRut: response.requester?.rut || '',
+          casinoId: initialCasino?.id || '',
           destinationId: response.catalogs.destinations[0]?.id || '',
           motiveId: response.catalogs.motives[0]?.id || ''
         }));
+        if (!response.requester && response.canManageOthers) setRequesterDialog(true);
       })
       .catch((requestError) => setError(requestError.response?.data?.message || 'No fue posible preparar la solicitud.'))
       .finally(() => setLoading(false));
@@ -255,7 +266,7 @@ export default function NewOrderPage() {
     if (!requesterDialog || !orderContext?.canManageOthers) return undefined;
     const timeout = window.setTimeout(() => {
       setPersonsLoading(true);
-      listPersonas({ search: personSearch, estado: 1, pageSize: 8 })
+      listCasinoRequesters({ q: personSearch, active: 1, pageSize: 8 })
         .then((response) => setPersons(response.data || []))
         .catch(() => setPersons([]))
         .finally(() => setPersonsLoading(false));
@@ -312,16 +323,16 @@ export default function NewOrderPage() {
   const chooseRequester = (person) => {
     const requester = {
       rut: person.rut,
-      fullRut: person.rutCompleto,
-      name: person.nombreCompleto,
-      active: person.estado === 1,
+      fullRut: `${person.rut}-${person.dv}`,
+      name: [person.names, person.paternalSurname, person.maternalSurname].filter(Boolean).join(' '),
+      active: person.active,
       location: {
-        divisionId: person.divisionId,
-        division: person.division,
-        subdivisionId: person.subdivisionId,
-        subdivision: person.subdivision,
-        costCenterId: person.centroCostoId,
-        costCenter: person.centroCosto
+        divisionId: person.divisionCode,
+        division: person.divisionName,
+        subdivisionId: person.subdivisionCode,
+        subdivision: person.subdivisionName,
+        costCenterId: person.costCenterCode,
+        costCenter: person.costCenterName
       }
     };
     requester.missingLocationFields = getMissingLocationFields(requester);
@@ -491,33 +502,41 @@ export default function NewOrderPage() {
                     <Typography variant="overline" color="text.secondary">
                       SOLICITANTE
                     </Typography>
-                    <Typography variant="h5">{selectedRequester?.name}</Typography>
+                    <Typography variant="h5">{selectedRequester?.name || 'Seleccione un solicitante'}</Typography>
                     <Typography variant="body2" color="text.secondary">
-                      {selectedRequester?.fullRut} · {displayLocation(selectedRequester) || 'Ubicación organizacional incompleta'}
+                      {selectedRequester
+                        ? `${selectedRequester.fullRut} · ${displayLocation(selectedRequester) || 'Ubicación organizacional incompleta'}`
+                        : 'Su cuenta administra pedidos, pero no está registrada como solicitante.'}
                     </Typography>
                   </Box>
                 </Stack>
                 {orderContext.canManageOthers && (
                   <Button variant="outlined" onClick={() => setRequesterDialog(true)}>
-                    Cambiar persona
+                    {selectedRequester ? 'Cambiar persona' : 'Seleccionar solicitante'}
                   </Button>
                 )}
               </Stack>
               {!requesterReady && (
                 <Alert severity="warning" sx={{ mt: 2 }}>
-                  <Typography variant="subtitle2">La ficha del solicitante no está lista para imputar un pedido.</Typography>
-                  <Typography variant="body2" sx={{ mt: 0.5 }}>
-                    Faltan: {formatSpanishList(missingRequesterFields.map((field) => field.label))}. Estos datos deben completarse en
-                    Personas; no se reemplazan manualmente en la solicitud.
+                  <Typography variant="subtitle2">
+                    {selectedRequester
+                      ? 'La ficha del solicitante no está lista para imputar un pedido.'
+                      : 'Debe seleccionar un solicitante para crear el pedido.'}
                   </Typography>
+                  {selectedRequester && (
+                    <Typography variant="body2" sx={{ mt: 0.5 }}>
+                      Faltan: {formatSpanishList(missingRequesterFields.map((field) => field.label))}. Estos datos deben completarse en
+                      Solicitantes; no se reemplazan manualmente en la solicitud.
+                    </Typography>
+                  )}
                   <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} sx={{ mt: 1.25 }}>
                     {orderContext.canManageOthers && (
                       <Button size="small" variant="contained" onClick={() => setRequesterDialog(true)}>
                         Elegir otro solicitante
                       </Button>
                     )}
-                    <Button size="small" variant="outlined" onClick={() => navigate(`/personas/${selectedRequester?.rut}`)}>
-                      Revisar ficha de Personas
+                    <Button size="small" variant="outlined" onClick={() => navigate('/casino/maestros/solicitantes')}>
+                      Revisar Solicitantes
                     </Button>
                   </Stack>
                 </Alert>
@@ -573,14 +592,13 @@ export default function NewOrderPage() {
                   </TextField>
                 </Grid>
                 <Grid size={{ xs: 7, sm: 3 }}>
-                  <TextField
+                  <ChileDatePicker
                     fullWidth
                     required
                     label="Fecha de entrega"
-                    type="date"
                     value={form.deliveryDate}
-                    slotProps={{ inputLabel: { shrink: true } }}
-                    onChange={(event) => setForm((current) => ({ ...current, deliveryDate: event.target.value }))}
+                    clearable={false}
+                    onChange={(value) => setForm((current) => ({ ...current, deliveryDate: value }))}
                   />
                 </Grid>
                 <Grid size={{ xs: 5, sm: 3 }}>
@@ -825,11 +843,11 @@ export default function NewOrderPage() {
                 return (
                   <ListItemButton key={person.rut} divider disabled={disabled} onClick={() => chooseRequester(person)}>
                     <ListItemText
-                      primary={person.nombreCompleto}
+                      primary={[person.names, person.paternalSurname, person.maternalSurname].filter(Boolean).join(' ')}
                       secondary={
                         disabled
-                          ? `${person.rutCompleto} · Ficha incompleta: falta ${formatSpanishList(missingFields.map((field) => field.label.toLowerCase()))}`
-                          : `${person.rutCompleto} · ${[person.division, person.subdivision, person.centroCosto].filter(Boolean).join(' · ')}`
+                          ? `${person.rut}-${person.dv} · Ficha incompleta: falta ${formatSpanishList(missingFields.map((field) => field.label.toLowerCase()))}`
+                          : `${person.rut}-${person.dv} · ${[person.divisionName, person.subdivisionName, person.costCenterName].filter(Boolean).join(' · ')}`
                       }
                     />
                   </ListItemButton>

@@ -30,12 +30,14 @@
     "@mui/system": "7.3.8",
     "@mui/x-charts": "8.27.0",
     "@mui/x-data-grid": "^9.5.0",
+    "@mui/x-date-pickers": "^8.27.0",
     "@tanstack/react-query": "^5.101.0",
     "@vitejs/plugin-react": "5.1.4",
     "axios": "^1.21.1",
     "formik": "2.4.9",
     "framer-motion": "12.34.2",
     "lodash-es": "^4.18.1",
+    "moment": "^2.31.0",
     "react": "19.2.4",
     "react-device-detect": "2.2.3",
     "react-dom": "19.2.4",
@@ -70,6 +72,7 @@
     "@eslint/compat": "2.0.2",
     "@eslint/eslintrc": "3.3.3",
     "@eslint/js": "^9.39.5",
+    "deepmerge": "file:vendor/deepmerge",
     "eslint": "^9.39.5",
     "eslint-config-prettier": "10.1.8",
     "eslint-plugin-jsx-a11y": "6.10.2",
@@ -78,8 +81,7 @@
     "eslint-plugin-react-hooks": "7.0.1",
     "prettier": "3.8.1",
     "vite": "^7.3.8",
-    "vite-plugin-pwa": "^2.0.0",
-    "deepmerge": "file:vendor/deepmerge"
+    "vite-plugin-pwa": "^2.0.0"
   },
   "engines": {
     "node": ">=24.22.3 <25"

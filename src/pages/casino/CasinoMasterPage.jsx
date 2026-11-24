@@ -62,12 +62,12 @@ const CONFIG = {
 
 const initialForm = (catalog) =>
   catalog === 'casinos'
-    ? { name: '', rut: '', dv: '', email: '' }
+    ? { externalCode: '', name: '', rut: '', dv: '', email: '', active: true }
     : catalog === 'tipos-producto'
-      ? { name: '', order: 0, access: 0 }
+      ? { externalCode: '', name: '', order: 0, access: 0, active: true }
       : catalog === 'productos'
-        ? { name: '', price: 0, casinoId: '', categoryId: '' }
-        : { name: '' };
+        ? { externalCode: '', name: '', price: 0, casinoId: '', categoryId: '', active: true }
+        : { externalCode: '', name: '', active: true };
 
 const errorMessage = (error) => error.response?.data?.message || 'No fue posible completar la operación.';
 
@@ -206,8 +206,10 @@ export default function CasinoMasterPage({ catalog }) {
     };
     const base = [
       actions,
-      { field: 'id', headerName: 'Código', width: 95 },
-      { field: 'name', headerName: 'Nombre', minWidth: 210, flex: 1 }
+      { field: 'id', headerName: 'ID interno', width: 100 },
+      { field: 'externalCode', headerName: 'Código externo', width: 135 },
+      { field: 'name', headerName: 'Nombre', minWidth: 210, flex: 1 },
+      { field: 'active', headerName: 'Estado', width: 100, valueFormatter: (value) => (value ? 'Activo' : 'Inactivo') }
     ];
     if (catalog === 'casinos')
       return [
@@ -403,11 +405,18 @@ export default function CasinoMasterPage({ catalog }) {
           <Stack spacing={2} sx={{ pt: 1 }}>
             <TextField
               autoFocus
+              label="Código externo"
+              value={form.values.externalCode}
+              onChange={(event) => setValue('externalCode', event.target.value)}
+              required
+              inputProps={{ maxLength: 30 }}
+            />
+            <TextField
               label="Nombre"
               value={form.values.name}
               onChange={(event) => setValue('name', event.target.value)}
               required
-              inputProps={{ maxLength: 40 }}
+              inputProps={{ maxLength: catalog === 'productos' ? 60 : 40 }}
             />
             {catalog === 'casinos' && (
               <>
@@ -491,6 +500,15 @@ export default function CasinoMasterPage({ catalog }) {
                 />
               </>
             )}
+            <TextField
+              select
+              label="Estado"
+              value={form.values.active ? 1 : 0}
+              onChange={(event) => setValue('active', Number(event.target.value) === 1)}
+            >
+              <MenuItem value={1}>Activo</MenuItem>
+              <MenuItem value={0}>Inactivo</MenuItem>
+            </TextField>
           </Stack>
         </DialogContent>
         <DialogActions>

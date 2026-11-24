@@ -66,7 +66,7 @@ export default function NavItem({ item, level, isParents = false, setSelectedID 
           selected={isSelected}
           sx={(theme) => ({
             zIndex: 1201,
-            pl: drawerOpen ? `${level * 28}px` : 1.5,
+            pl: drawerOpen ? `${level * 24}px` : 1.5,
             py: !drawerOpen && level === 1 ? 1.25 : 1,
             ...(drawerOpen && {
               '&:hover': { bgcolor: 'primary.lighter' },
@@ -111,7 +111,15 @@ export default function NavItem({ item, level, isParents = false, setSelectedID 
           {(drawerOpen || (!drawerOpen && level !== 1)) && (
             <ListItemText
               primary={
-                <Typography variant="h6" sx={{ color: isSelected ? iconSelectedColor : textColor }}>
+                <Typography
+                  variant="h6"
+                  sx={{
+                    color: isSelected ? iconSelectedColor : textColor,
+                    whiteSpace: 'normal',
+                    overflowWrap: 'anywhere',
+                    lineHeight: 1.35
+                  }}
+                >
                   {item.title}
                 </Typography>
               }
