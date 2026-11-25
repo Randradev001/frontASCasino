@@ -5,7 +5,7 @@ import Typography from '@mui/material/Typography';
 
 import { useAuth } from 'contexts/AuthContext';
 import { buildAuthorizedMenu } from 'menu-items/authorizedMenu';
-import dashboard from 'menu-items/dashboard';
+import { buildShortcuts } from 'menu-items/shortcuts';
 import seguridad from 'menu-items/seguridad';
 import NavGroup from './NavGroup';
 
@@ -13,8 +13,12 @@ export default function Navigation() {
   const { menu, session } = useAuth();
   const menuItems = useMemo(
     () =>
-      [dashboard, buildAuthorizedMenu(menu, session?.security?.canManage), session?.security?.canManage ? seguridad : null].filter(Boolean),
-    [menu, session?.security?.canManage]
+      [
+        buildShortcuts(session?.permissions, session?.security?.canManage),
+        buildAuthorizedMenu(menu, session?.security?.canManage),
+        session?.security?.canManage ? seguridad : null
+      ].filter(Boolean),
+    [menu, session?.permissions, session?.security?.canManage]
   );
 
   const navGroups = menuItems.map((item) => {

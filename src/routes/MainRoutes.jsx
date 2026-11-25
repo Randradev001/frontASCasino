@@ -4,6 +4,8 @@ import Loadable from 'components/Loadable';
 import DashboardLayout from 'layout/Dashboard';
 import ProtectedRoute from './ProtectedRoute';
 import SecurityAdminRoute from './SecurityAdminRoute';
+import PermissionRoute from './PermissionRoute';
+import HomeRoute from './HomeRoute';
 import RouteErrorPage from './RouteErrorPage';
 
 const DashboardDefault = Loadable(lazy(() => import('pages/dashboard/default')));
@@ -22,6 +24,7 @@ const CasinoGeneralDownloadPage = Loadable(lazy(() => import('pages/casino/Casin
 const CasinoMailStatusPage = Loadable(lazy(() => import('pages/casino/CasinoMailStatusPage')));
 const CasinoLoadPage = Loadable(lazy(() => import('pages/casino/CasinoLoadPage')));
 const CasinoRequestersPage = Loadable(lazy(() => import('pages/casino/CasinoRequestersPage')));
+const ProfileDashboardPage = Loadable(lazy(() => import('pages/casino/ProfileDashboardPage')));
 
 const MainRoutes = {
   path: '/',
@@ -32,8 +35,36 @@ const MainRoutes = {
     </ProtectedRoute>
   ),
   children: [
-    { path: '/', element: <DashboardDefault /> },
-    { path: 'dashboard', children: [{ path: 'default', element: <DashboardDefault /> }] },
+    { path: '/', element: <HomeRoute /> },
+    {
+      path: 'dashboard',
+      children: [
+        {
+          path: 'default',
+          element: (
+            <PermissionRoute admin>
+              <DashboardDefault />
+            </PermissionRoute>
+          )
+        },
+        {
+          path: 'mis-pedidos',
+          element: (
+            <PermissionRoute system={55} module={1} program={1}>
+              <ProfileDashboardPage profile="person" />
+            </PermissionRoute>
+          )
+        },
+        {
+          path: 'casino',
+          element: (
+            <PermissionRoute system={55} module={1} program={10}>
+              <ProfileDashboardPage profile="casino" />
+            </PermissionRoute>
+          )
+        }
+      ]
+    },
     { path: 'personas', element: <PersonasPage /> },
     { path: 'personas/:rut', element: <PersonaDetailPage /> },
     { path: 'casino/pedidos/nuevo', element: <NewOrderPage /> },

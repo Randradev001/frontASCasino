@@ -8,6 +8,9 @@ const cleanParams = (params = {}) =>
 export const getOrdersDashboard = async (params = {}) =>
   (await api.get('/backendDocker/casino/bi/pedidos', { params: cleanParams(params) })).data;
 
+export const getMyOrdersDashboard = async () => (await api.get('/backendDocker/casino/bi/mis-pedidos')).data;
+export const getCasinoDashboard = async () => (await api.get('/backendDocker/casino/bi/casino')).data;
+
 export const getOrdersHistory = async (params = {}) =>
   (await api.get('/backendDocker/casino/bi/historial', { params: cleanParams(params) })).data;
 

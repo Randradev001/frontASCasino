@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import ArrowLeftOutlined from '@ant-design/icons/ArrowLeftOutlined';
 import CheckOutlined from '@ant-design/icons/CheckOutlined';
@@ -45,7 +45,14 @@ import lunchImage from 'assets/images/products/lunch.webp';
 import pastryImage from 'assets/images/products/pastry.webp';
 import sandwichesImage from 'assets/images/products/sandwiches.webp';
 import utensilsImage from 'assets/images/products/utensils.webp';
-import { casinoOrderProductImageUrl, createOrderDraft, getOrderContext, sendOrder } from 'api/casinoPedidosApi';
+import {
+  casinoOrderProductImageUrl,
+  createOrderDraft,
+  getOrderContext,
+  getOrderDraft,
+  updateOrderDraft,
+  sendOrder
+} from 'api/casinoPedidosApi';
 import { listCasinoRequesters } from 'api/casinoSolicitantesApi';
 
 const BLUE = '#00549F';
@@ -216,6 +223,8 @@ ProductCard.propTypes = {
 
 export default function NewOrderPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const draftNumber = Number(searchParams.get('borrador')) || null;
   const [orderContext, setOrderContext] = useState(null);
   const [form, setForm] = useState({
     requesterRut: '',
@@ -243,7 +252,7 @@ export default function NewOrderPage() {
 
   useEffect(() => {
     getOrderContext()
-      .then((response) => {
+      .then(async (response) => {
         const initialCasino =
           response.catalogs.casinos.find((casino) => response.catalogs.products.some((product) => product.casinoId === casino.id)) ||
           response.catalogs.casinos[0];
@@ -256,11 +265,25 @@ export default function NewOrderPage() {
           destinationId: response.catalogs.destinations[0]?.id || '',
           motiveId: response.catalogs.motives[0]?.id || ''
         }));
+        if (draftNumber) {
+          const draft = await getOrderDraft(draftNumber);
+          setForm({
+            requesterRut: String(draft.requesterRut),
+            casinoId: draft.casinoId,
+            destinationId: draft.destinationId,
+            motiveId: draft.motiveId,
+            deliveryDate: draft.deliveryDate,
+            deliveryTime: draft.deliveryTime,
+            description: draft.description
+          });
+          setQuantities(Object.fromEntries(draft.lines.map((line) => [line.productCode, line.quantity])));
+          setNotice(`Retomando borrador #${draft.number}`);
+        }
         if (!response.requester && response.canManageOthers) setRequesterDialog(true);
       })
       .catch((requestError) => setError(requestError.response?.data?.message || 'No fue posible preparar la solicitud.'))
       .finally(() => setLoading(false));
-  }, []);
+  }, [draftNumber]);
 
   useEffect(() => {
     if (!requesterDialog || !orderContext?.canManageOthers) return undefined;
@@ -374,7 +397,7 @@ export default function NewOrderPage() {
     setError('');
     let draft;
     try {
-      draft = await createOrderDraft({
+      const payload = {
         requesterRut: Number(form.requesterRut),
         casinoId: Number(form.casinoId),
         destinationId: Number(form.destinationId),
@@ -383,7 +406,8 @@ export default function NewOrderPage() {
         deliveryTime: form.deliveryTime,
         description: form.description,
         lines: cart.map((product) => ({ productCode: product.id, quantity: product.quantity }))
-      });
+      };
+      draft = draftNumber ? await updateOrderDraft(draftNumber, payload) : await createOrderDraft(payload);
       const result = sendAfterCreate ? await sendOrder(draft.number) : draft;
       if (sendAfterCreate) navigate(`/casino/pedidos/historial?pedido=${encodeURIComponent(result.number)}`);
       else setSuccess(result);

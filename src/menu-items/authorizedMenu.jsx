@@ -144,7 +144,7 @@ export const buildAuthorizedMenu = (systems = [], canManageSecurity = false) => 
                 title: program.nombre,
                 type: 'item',
                 url: program.url,
-                target: Boolean(program.target),
+                target: false,
                 icon: programIcons[program.url] || FileOutlined
               }))
           );
