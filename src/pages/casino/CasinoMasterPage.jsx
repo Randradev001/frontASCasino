@@ -36,7 +36,8 @@ import {
   deleteCasinoMaster,
   getCasinoMasterOptions,
   listCasinoMaster,
-  updateCasinoMaster
+  updateCasinoMaster,
+  casinoProductImageUrl
 } from 'api/casinoMaestrosApi';
 
 const money = new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 });
@@ -66,7 +67,17 @@ const initialForm = (catalog) =>
     : catalog === 'tipos-producto'
       ? { externalCode: '', name: '', order: 0, access: 0, active: true }
       : catalog === 'productos'
-        ? { externalCode: '', name: '', price: 0, casinoId: '', categoryId: '', active: true }
+        ? {
+            externalCode: '',
+            name: '',
+            price: 0,
+            casinoId: '',
+            categoryId: '',
+            active: true,
+            image: null,
+            imagePreview: '',
+            removeImage: false
+          }
         : { externalCode: '', name: '', active: true };
 
 const errorMessage = (error) => error.response?.data?.message || 'No fue posible completar la operación.';
@@ -175,12 +186,44 @@ export default function CasinoMasterPage({ catalog }) {
   });
 
   const openCreate = () => setForm({ open: true, row: null, values: initialForm(catalog) });
-  const openEdit = (row) => setForm({ open: true, row, values: { ...initialForm(catalog), ...row } });
+  const openEdit = (row) =>
+    setForm({
+      open: true,
+      row,
+      values: {
+        ...initialForm(catalog),
+        ...row,
+        imagePreview: catalog === 'productos' && row.hasImage ? `${casinoProductImageUrl(row.id)}?v=${Date.now()}` : ''
+      }
+    });
   const changeFilter = (name, value) => {
     setPagination((current) => ({ ...current, page: 0 }));
     setFilters((current) => ({ ...current, [name]: value }));
   };
   const setValue = (name, value) => setForm((current) => ({ ...current, values: { ...current.values, [name]: value } }));
+  const selectImage = (file) => {
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) {
+      notify('La imagen admite un máximo de 2 MB.', 'error');
+      return;
+    }
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+      notify('Selecciona una imagen JPEG, PNG o WebP.', 'error');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () =>
+      setForm((current) => ({
+        ...current,
+        values: { ...current.values, image: file, imagePreview: reader.result, removeImage: false }
+      }));
+    reader.readAsDataURL(file);
+  };
+  const removeImage = () =>
+    setForm((current) => ({
+      ...current,
+      values: { ...current.values, image: null, imagePreview: '', removeImage: Boolean(current.row?.hasImage) }
+    }));
 
   const columns = (() => {
     const actions = {
@@ -465,6 +508,42 @@ export default function CasinoMasterPage({ catalog }) {
             )}
             {catalog === 'productos' && (
               <>
+                <Box sx={{ display: 'grid', gap: 1, justifyItems: 'start' }}>
+                  <Typography variant="subtitle2">Imagen del producto</Typography>
+                  {form.values.imagePreview ? (
+                    <Box
+                      component="img"
+                      src={form.values.imagePreview}
+                      alt={`Vista previa de ${form.values.name || 'producto'}`}
+                      sx={{ width: 180, height: 130, objectFit: 'cover', borderRadius: 1.5, border: '1px solid', borderColor: 'divider' }}
+                    />
+                  ) : (
+                    <Box sx={{ width: 180, height: 100, display: 'grid', placeItems: 'center', bgcolor: 'grey.100', borderRadius: 1.5 }}>
+                      <Typography variant="caption" color="text.secondary">
+                        Sin imagen
+                      </Typography>
+                    </Box>
+                  )}
+                  <Stack direction="row" spacing={1}>
+                    <Button component="label" variant="outlined" size="small">
+                      {form.values.imagePreview ? 'Cambiar imagen' : 'Cargar imagen'}
+                      <input
+                        hidden
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp"
+                        onChange={(event) => selectImage(event.target.files?.[0])}
+                      />
+                    </Button>
+                    {form.values.imagePreview && (
+                      <Button color="error" size="small" onClick={removeImage}>
+                        Quitar
+                      </Button>
+                    )}
+                  </Stack>
+                  <Typography variant="caption" color="text.secondary">
+                    JPEG, PNG o WebP · máximo 2 MB
+                  </Typography>
+                </Box>
                 <TextField
                   select
                   label="Casino"

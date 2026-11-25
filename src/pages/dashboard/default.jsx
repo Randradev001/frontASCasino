@@ -176,6 +176,7 @@ export default function DashboardDefault() {
   };
 
   const assistantAvailable = Boolean(dashboard?.assistant?.answers);
+  const availablePlants = dashboard?.metadata?.availablePlants || [];
 
   if (loading && !dashboard) {
     return (
@@ -208,8 +209,7 @@ export default function DashboardDefault() {
               Panel ejecutivo de pedidos
             </Typography>
             <Typography sx={{ mt: 1, color: 'rgba(255,255,255,.78)', maxWidth: 680 }}>
-              Vista consolidada para Rosario, San Vicente y Lo Miranda. Empresa activa:{' '}
-              {company?.nombre || `Empresa ${company?.empCod || ''}`}.
+              Vista de las plantas asociadas a la empresa activa: {company?.nombre || `Empresa ${company?.empCod || ''}`}.
             </Typography>
           </Grid>
           <Grid size={{ xs: 12, md: 5 }}>
@@ -256,10 +256,12 @@ export default function DashboardDefault() {
                 value={draftFilters.plant}
                 onChange={(event) => setDraftFilters((current) => ({ ...current, plant: event.target.value }))}
               >
-                <MenuItem value="all">Todas las faenadoras</MenuItem>
-                <MenuItem value="rosario">Faenadora Rosario</MenuItem>
-                <MenuItem value="san-vicente">Faenadora San Vicente</MenuItem>
-                <MenuItem value="lo-miranda">Faenadora Lo Miranda</MenuItem>
+                <MenuItem value="all">Todas las faenadoras autorizadas</MenuItem>
+                {availablePlants.map((plant) => (
+                  <MenuItem key={plant.id} value={plant.id}>
+                    {plant.name}
+                  </MenuItem>
+                ))}
               </TextField>
             </Grid>
             <Grid size={{ xs: 6, sm: 3, lg: 2 }}>

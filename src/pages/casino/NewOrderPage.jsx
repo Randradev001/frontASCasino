@@ -45,7 +45,7 @@ import lunchImage from 'assets/images/products/lunch.webp';
 import pastryImage from 'assets/images/products/pastry.webp';
 import sandwichesImage from 'assets/images/products/sandwiches.webp';
 import utensilsImage from 'assets/images/products/utensils.webp';
-import { createOrderDraft, getOrderContext, sendOrder } from 'api/casinoPedidosApi';
+import { casinoOrderProductImageUrl, createOrderDraft, getOrderContext, sendOrder } from 'api/casinoPedidosApi';
 import { listCasinoRequesters } from 'api/casinoSolicitantesApi';
 
 const BLUE = '#00549F';
@@ -146,7 +146,7 @@ QuantityControl.propTypes = {
 };
 
 function ProductCard({ product, category, quantity, onQuantity }) {
-  const image = categoryImage(category?.name);
+  const image = product.hasImage ? casinoOrderProductImageUrl(product.id) : categoryImage(category?.name);
   return (
     <Paper
       elevation={0}
@@ -170,7 +170,7 @@ function ProductCard({ product, category, quantity, onQuantity }) {
         <Box
           component="img"
           src={image}
-          alt={`Imagen referencial de ${product.name}`}
+          alt={`Imagen de ${product.name}`}
           sx={{ width: '100%', height: 158, objectFit: 'cover', display: 'block' }}
         />
         <Chip
